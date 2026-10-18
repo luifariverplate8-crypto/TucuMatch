@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TucuMatch - Citas & Encuentros en Tucumán</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @keyframes pulseHeart {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    .heart-pulse { animation: pulseHeart 1.5s infinite; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-between font-sans">
+
+  <!-- Header principal -->
+  <header class="w-full max-w-md bg-slate-900/90 backdrop-blur-md border-b border-slate-800 p-4 sticky top-0 z-40 flex items-center justify-between shadow-lg">
+    <div class="flex items-center gap-2">
+      <span class="text-rose-500 text-2xl"><i class="fa-solid fa-heart-pulse heart-pulse"></i></span>
+      <h1 class="text-xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400">TucuMatch</h1>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="openAgeModal()" class="px-3 py-1.5 rounded-full bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700 hover:border-rose-500/50">
+        <i class="fa-solid fa-sliders text-rose-400 mr-1"></i> Filtros
+      </button>
+      <button onclick="openSelfieModal()" class="px-3 py-1.5 rounded-full bg-emerald-500/20 text-xs font-semibold text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30">
+        <i class="fa-solid fa-shield-halved mr-1"></i> Verificar
+      </button>
+    </div>
+  </header>
+
+  <!-- Filtro por Zona -->
+  <div class="w-full max-w-md px-4 pt-3 flex gap-2 overflow-x-auto no-scrollbar">
+    <button onclick="filterZone('Todas')" class="zone-btn active px-4 py-1.5 rounded-full text-xs font-bold bg-rose-500 text-white shadow-md">Todas</button>
+    <button onclick="filterZone('Yerba Buena')" class="zone-btn px-4 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700">Yerba Buena</button>
+    <button onclick="filterZone('Barrio Norte')" class="zone-btn px-4 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700">Barrio Norte</button>
+    <button onclick="filterZone('Centro')" class="zone-btn px-4 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700">Centro</button>
+  </div>
+
+  <!-- Contenido Principal -->
+  <main class="w-full max-w-md p-4 flex-1 flex flex-col justify-center">
+
+    <!-- SECCIÓN 1: DESCUBRIR (Cards de Citas) -->
+    <section id="view-discover" class="view-section flex flex-col items-center">
+      <div id="cardContainer" class="w-full relative min-h-[500px]">
+        <!-- Las tarjetas se cargan dinámicamente desde el JS -->
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: CHATS -->
+    <section id="view-chats" class="view-section hidden space-y-3">
+      <h2 class="text-lg font-extrabold text-white mb-2"><i class="fa-solid fa-comments text-rose-500 mr-2"></i>Tus Conversaciones</h2>
+      <div id="chatsList" class="space-y-2">
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl flex items-center justify-between cursor-pointer hover:border-slate-700" onclick="openChat('Lara Albarracín')">
+          <div class="flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500" class="w-12 h-12 rounded-full object-cover border border-rose-500">
+            <div>
+              <h4 class="font-bold text-sm text-white flex items-center gap-1">Lara Albarracín <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i></h4>
+              <p class="text-xs text-slate-400">¡Hola! ¿Sale ese mate en la Plaza Urquiza? 🧉</p>
+            </div>
+          </div>
+          <span class="text-xs text-rose-400 font-semibold">✓✓</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: MI PERFIL -->
+    <section id="view-profile" class="view-section hidden space-y-4">
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">
+        <h2 class="text-lg font-extrabold text-white"><i class="fa-solid fa-id-card text-rose-500 mr-2"></i>Crear Perfil en TucuMatch</h2>
+        <form onsubmit="submitCreateUser(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="text-slate-400 block mb-1">DNI (Para prevención de fraudes)</label>
+            <input type="text" id="inputDni" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-rose-500 outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-slate-400 block mb-1">Nombre</label>
+              <input type="text" id="inputName" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-rose-500 outline-none">
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1">Edad</label>
+              <input type="number" id="inputAge" required class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-rose-500 outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Zona / Barrio</label>
+            <select id="inputZone" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-rose-500 outline-none">
+              <option value="Yerba Buena">Yerba Buena</option>
+              <option value="Barrio Norte">Barrio Norte</option>
+              <option value="Centro">Centro</option>
+              <option value="Tafí Viejo">Tafí Viejo</option>
+              <option value="Concepción">Concepción</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Tu Cita Ideal</label>
+            <input type="text" id="inputIdealDate" placeholder="Ej: Mates en la Plaza Urquiza" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-rose-500 outline-none">
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">URL Foto de Perfil</label>
+            <input type="url" id="inputPhotoUrl" placeholder="https://..." class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-rose-500 outline-none">
+          </div>
+          <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold shadow-lg shadow-rose-500/25 hover:opacity-95">Guardar y Empezar a Hacer Match 🔥</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: Selfie Verificada -->
+  <div id="selfieModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 rounded-3xl p-6 max-w-sm w-full text-center border border-emerald-500/30">
+      <h3 class="text-xl font-bold text-white mb-2">📸 Verificación en Vivo</h3>
+      <p class="text-xs text-slate-400 mb-4">Ubicá tu rostro en la cámara para validar tu perfil auténtico.</p>
+      <video id="webcam" autoplay playsinline class="w-full h-48 object-cover rounded-2xl bg-black mb-4 border border-slate-700"></video>
+      <div class="flex gap-2">
+        <button onclick="closeSelfieModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-semibold text-sm">Cancelar</button>
+        <button onclick="captureSelfie()" class="w-1/2 py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-bold text-sm hover:bg-emerald-400">Capturar 📸</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Pop-up Animado de Match -->
+  <div id="matchModal" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50 p-6 text-center">
+    <div class="text-6xl mb-4 animate-bounce">💖🔥</div>
+    <h2 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-pink-400 mb-2">¡Es un Match!</h2>
+    <p id="matchText" class="text-slate-300 text-sm mb-6">A vos y a esta persona les gustaría conectarse.</p>
+    <button onclick="closeMatchModal()" class="w-full max-w-xs py-3.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold shadow-lg shadow-rose-500/30">Enviar Mensaje 💬</button>
+  </div>
+
+  <!-- MODAL 3: Filtro de Edad -->
+  <div id="ageModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 rounded-3xl p-6 max-w-sm w-full text-center border border-slate-800">
+      <h3 class="text-lg font-bold text-white mb-4">🎚️ Rango de Edad Preferido</h3>
+      <input type="range" id="ageRange" min="18" max="50" value="30" class="w-full accent-rose-500 mb-2" oninput="document.getElementById('ageVal').innerText = this.value">
+      <p class="text-sm text-slate-300 mb-6">Hasta <span id="ageVal" class="font-bold text-rose-400">30</span> años</p>
+      <button onclick="document.getElementById('ageModal').classList.add('hidden')" class="w-full py-2.5 rounded-xl bg-rose-500 text-white font-bold text-sm">Aplicar Filtro</button>
+    </div>
+  </div>
+
+  <!-- Navegación Inferior -->
+  <nav class="w-full max-w-md bg-slate-900/90 backdrop-blur-md border-t border-slate-800 p-2 flex justify-around sticky bottom-0 z-40">
+    <button onclick="switchTab('discover')" class="nav-btn active flex flex-col items-center gap-1 text-rose-500">
+      <i class="fa-solid fa-heart-circle-bolt text-xl"></i>
+      <span class="text-[10px] font-bold">Descubrir</span>
+    </button>
+    <button onclick="switchTab('chats')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200">
+      <i class="fa-solid fa-comments text-xl"></i>
+      <span class="text-[10px] font-bold">Chats</span>
+    </button>
+    <button onclick="switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200">
+      <i class="fa-solid fa-user text-xl"></i>
+      <span class="text-[10px] font-bold">Mi Perfil</span>
+    </button>
+  </nav>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+    let rawUsersList = [];
+    let currentCardIndex = 0;
+
+    window.onload = function() {
+      loadDiscoveryUsers();
+    };
+
+    async function loadDiscoveryUsers() {
+      try {
+        const res = await fetch(`${API_BASE}/users/`);
+        if (res.ok) {
+          rawUsersList = await res.json();
+          renderCards();
+        }
+      } catch (err) {
+        console.log("Servidor local no detectado aún.");
+      }
+    }
+
+    function renderCards() {
+      const container = document.getElementById('cardContainer');
+      container.innerHTML = '';
+
+      if (currentCardIndex >= rawUsersList.length) {
+        container.innerHTML = `
+          <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center min-h-[450px]">
+            <span class="text-4xl mb-3">✨</span>
+            <h3 class="text-lg font-bold text-white mb-1">¡Viste todos los perfiles por hoy!</h3>
+            <p class="text-xs text-slate-400 mb-4">Volvé más tarde o cambiá tu zona en los filtros.</p>
+            <button onclick="currentCardIndex=0; renderCards();" class="px-5 py-2.5 rounded-full bg-rose-500 text-white text-xs font-bold">Reiniciar Descubrir</button>
+          </div>
+        `;
+        return;
+      }
+
+      const user = rawUsersList[currentCardIndex];
+      const interests = user.interests ? JSON.parse(user.interests) : ["Trekking", "Música"];
+
+      container.innerHTML = `
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative min-h-[500px] flex flex-col justify-end">
+          <img src="${user.photo_url}" class="absolute inset-0 w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+
+          <!-- Badge Verificado -->
+          <div class="absolute top-4 left-4 flex gap-2">
+            <span class="bg-slate-900/80 backdrop-blur-md text-emerald-400 text-[10px] font-bold px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1">
+              <i class="fa-solid fa-circle-check"></i> Selfie Verificada
+            </span>
+            <span class="bg-amber-500/20 backdrop-blur-md text-amber-300 text-[10px] font-bold px-3 py-1 rounded-full border border-amber-500/30">
+              88% Compatible
+            </span>
+          </div>
+
+          <!-- Info Perfil -->
+          <div class="relative p-6 space-y-3 z-10">
+            <div>
+              <h2 class="text-2xl font-black text-white flex items-center gap-2">
+                ${user.name}, ${user.age}
+              </h2>
+              <p class="text-xs text-slate-300 flex items-center gap-1 mt-0.5">
+                <i class="fa-solid fa-location-dot text-rose-500"></i> ${user.zone}, Tucumán
+              </p>
+            </div>
+
+            <!-- Intereses -->
+            <div class="flex flex-wrap gap-1.5">
+              ${interests.map(i => `<span class="bg-slate-800/80 backdrop-blur-sm text-slate-200 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-slate-700">${i}</span>`).join('')}
+            </div>
+
+            <!-- Cita Ideal -->
+            <div class="bg-slate-900/80 border border-slate-700/50 p-2.5 rounded-2xl flex items-center justify-between">
+              <div>
+                <span class="text-[9px] text-rose-400 font-bold uppercase tracking-wider block">Plan de Cita Ideal</span>
+                <p class="text-xs text-white font-medium">${user.ideal_date || 'Mates en la Plaza Urquiza'}</p>
+              </div>
+              <button onclick="triggerMatchPopup('${user.name}')" class="px-3 py-1.5 rounded-xl bg-rose-500 text-white text-[10px] font-bold hover:bg-rose-600">Aceptar 🥂</button>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex items-center justify-around pt-2">
+              <button onclick="nextCard()" class="w-14 h-14 rounded-full bg-slate-900/90 border border-slate-700 text-slate-400 text-xl flex items-center justify-center hover:text-rose-500 shadow-lg">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+              <button onclick="triggerMatchPopup('${user.name}')" class="w-16 h-16 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-2xl flex items-center justify-center shadow-lg shadow-rose-500/40 hover:scale-105 transition-transform">
+                <i class="fa-solid fa-heart"></i>
+              </button>
+              <button onclick="triggerMatchPopup('${user.name}')" class="w-14 h-14 rounded-full bg-slate-900/90 border border-amber-500/40 text-amber-400 text-xl flex items-center justify-center shadow-lg">
+                <i class="fa-solid fa-bolt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function nextCard() {
+      currentCardIndex++;
+      renderCards();
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('text-rose-500');
+        b.classList.add('text-slate-400');
+      });
+      event.currentTarget.classList.remove('text-slate-400');
+      event.currentTarget.classList.add('text-rose-500');
+    }
+
+    function filterZone(zone) {
+      document.querySelectorAll('.zone-btn').forEach(b => {
+        b.classList.remove('bg-rose-500', 'text-white');
+        b.classList.add('bg-slate-800', 'text-slate-300');
+      });
+      event.currentTarget.classList.remove('bg-slate-800', 'text-slate-300');
+      event.currentTarget.classList.add('bg-rose-500', 'text-white');
+      
+      currentCardIndex = 0;
+      renderCards();
+    }
+
+    // Funciones de Modales
+    async function openSelfieModal() {
+      document.getElementById('selfieModal').classList.remove('hidden');
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        document.getElementById('webcam').srcObject = stream;
+      } catch (err) {
+        console.log("Cámara no disponible.");
+      }
+    }
+
+    function closeSelfieModal() {
+      const video = document.getElementById('webcam');
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+      }
+      document.getElementById('selfieModal').classList.add('hidden');
+    }
+
+    function captureSelfie() {
+      closeSelfieModal();
+      alert("¡Perfil verificado con éxito! Ahora tenés la tilde verde 🛡️");
+    }
+
+    function triggerMatchPopup(userName) {
+      document.getElementById('matchText').innerText = `A vos y a ${userName} les gustaría conectarse.`;
+      document.getElementById('matchModal').classList.remove('hidden');
+    }
+
+    function closeMatchModal() {
+      document.getElementById('matchModal').classList.add('hidden');
+      switchTab('chats');
+    }
+
+    function openAgeModal() {
+      document.getElementById('ageModal').classList.remove('hidden');
+    }
+
+    async function submitCreateUser(e) {
+      e.preventDefault();
+      const newUser = {
+        dni: document.getElementById('inputDni').value,
+        name: document.getElementById('inputName').value,
+        age: parseInt(document.getElementById('inputAge').value),
+        zone: document.getElementById('inputZone').value,
+        ideal_date: document.getElementById('inputIdealDate').value || 'Mates en la Plaza Urquiza 🧉',
+        photo_url: document.getElementById('inputPhotoUrl').value || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=500'
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/users/`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(newUser)
+        });
+        if (res.ok) {
+          alert("¡Perfil creado con éxito!");
+          loadDiscoveryUsers();
+          switchTab('discover');
+        } else {
+          const err = await res.json();
+          alert(err.detail || "Error al crear perfil.");
+        }
+      } catch (err) {
+        alert("Asegurate de tener corriendo el backend con: python main.py");
+      }
+    }
+  </script>
+</body>
+</html>
