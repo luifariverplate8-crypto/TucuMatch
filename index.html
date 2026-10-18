@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TucuMatch - Citas y Encuentros en Tucumán</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @keyframes pulseHeart {
             0%, 100% { transform: scale(1); }
@@ -14,38 +14,50 @@
         .heart-pulse { animation: pulseHeart 1.5s infinite; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-between font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans pb-20">
 
     <!-- Header Principal -->
-    <header class="w-full max-w-md bg-slate-900/90 backdrop-blur-md border-b border-slate-800 p-4 sticky top-0 z-40 flex items-center justify-between shadow-lg">
+    <header class="w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800 p-4 sticky top-0 z-40 flex items-center justify-between shadow-lg max-w-md mx-auto">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-heart-circle-bolt text-rose-500 text-2xl heart-pulse"></i>
             <h1 class="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-rose-500 via-rose-400 to-amber-400">TucuMatch</h1>
         </div>
         <div class="flex items-center space-x-2">
-            <button onclick="abrirModalCrearPerfil()" class="px-3 py-1.5 rounded-full bg-rose-600 hover:bg-rose-500 text-xs font-semibold text-white transition flex items-center">
-                <i class="fa-solid fa-plus mr-1"></i> Crear Perfil
+            <button onclick="abrirModalFiltros()" class="p-2 rounded-full bg-slate-800 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold">
+                <i class="fa-solid fa-sliders"></i>
             </button>
-            <button onclick="abrirSelfieModal()" class="px-3 py-1.5 rounded-full bg-emerald-500/20 text-xs font-semibold text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30">
-                <i class="fa-solid fa-shield-halved mr-1"></i>Verificar
+            <button onclick="abrirModalCrearPerfil()" class="px-3 py-1.5 rounded-full bg-rose-600 hover:bg-rose-500 text-xs font-semibold text-white transition flex items-center">
+                <i class="fa-solid fa-plus mr-1"></i> Perfil
             </button>
         </div>
     </header>
 
     <!-- Contenido Principal / Tarjeta de Perfil -->
-    <main class="w-full max-w-md p-4 flex-1 flex flex-col justify-center items-center">
+    <main class="w-full max-w-md p-4 mx-auto flex-1 flex flex-col justify-center items-center">
         <div id="card-container" class="w-full bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative flex flex-col">
-            <!-- Galería de Fotos -->
+            
+            <!-- Galería de Fotos del Perfil -->
             <div class="relative h-96 w-full bg-slate-800">
-                <img id="profile-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500" class="w-full h-full object-cover" alt="Perfil">
+                <img id="profile-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500" class="w-full h-full object-cover transition-all duration-300" alt="Perfil">
                 
-                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-amber-400 border border-amber-500/30 flex items-center">
-                    <i class="fa-solid fa-location-dot mr-1 text-rose-400"></i>
+                <!-- Indicador de Galería (puntos/fotos) -->
+                <div id="gallery-dots" class="absolute top-2 w-full flex justify-center space-x-1.5 px-4 z-10">
+                    <div class="h-1 flex-1 bg-white rounded-full opacity-90"></div>
+                </div>
+
+                <!-- Botones para cambiar foto en la galería -->
+                <button onclick="fotoAnterior()" class="absolute left-0 top-0 bottom-0 w-1/3 z-10 focus:outline-none"></button>
+                <button onclick="fotoSiguiente()" class="absolute right-0 top-0 bottom-0 w-1/3 z-10 focus:outline-none"></button>
+
+                <!-- Badge de Zona -->
+                <div class="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-amber-400 border border-amber-500/30 flex items-center z-20">
+                    <i class="fa-solid fa-location-dot mr-1.5 text-rose-400"></i>
                     <span id="profile-barrio">Yerba Buena</span>
                 </div>
 
-                <div id="badge-verificado" class="absolute top-3 right-3 bg-emerald-500/90 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow flex items-center">
-                    <i class="fa-solid fa-check-double mr-1"></i> Verificado
+                <!-- Badge Verificado -->
+                <div id="badge-verificado" class="absolute top-4 right-3 bg-emerald-500/90 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow flex items-center z-20">
+                    <i class="fa-solid fa-circle-check mr-1"></i> Verificado
                 </div>
             </div>
 
@@ -58,30 +70,48 @@
                     <p id="profile-bio" class="text-slate-300 text-sm leading-relaxed mb-4">Amante del cerro San Javier y el sanguchazo de milanesa con todo 🥪</p>
                     
                     <!-- Rompehielos Tucumano -->
-                    <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50 mb-4">
+                    <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50 mb-2">
                         <p class="text-xs text-rose-400 font-bold uppercase tracking-wider mb-1"> Pregunta Tucumana:</p>
                         <p class="text-xs text-slate-200 font-medium">¿Sanguche de milanesa en primera cita es buen plan o red flag?</p>
                     </div>
                 </div>
 
                 <!-- Botones de Acción -->
-                <div class="flex items-center justify-evenly pt-2">
-                    <button onclick="siguientePerfil()" class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 text-xl flex items-center justify-center transition shadow-lg active:scale-95">
+                <div class="flex items-center justify-evenly pt-4">
+                    <!-- Botón Rechazar -->
+                    <button onclick="siguientePerfil()" class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 text-2xl flex items-center justify-center transition shadow-lg active:scale-95">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <button onclick="darLike()" class="w-16 h-16 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-2xl flex items-center justify-center transition shadow-xl shadow-rose-500/20 active:scale-95 hover:brightness-110">
-                        <i class="fa-solid fa-heart-arrow-between-neighbors"></i>
+                    <!-- Botón Me Gusta (Corazón con Flecha) -->
+                    <button onclick="darLike()" class="w-16 h-16 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white text-2xl flex items-center justify-center transition shadow-xl shadow-rose-500/30 active:scale-95 hover:scale-105">
+                        <i class="fa-solid fa-heart-circle-arrow-up text-2xl"></i>
                     </button>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Modal: Crear Perfil con Galería -->
+    <!-- Barra de Navegación Inferior -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 py-2 z-40 max-w-md mx-auto flex justify-around items-center">
+        <button onclick="cambiarPestaña('descubrir')" class="flex flex-col items-center text-rose-500 font-semibold text-xs">
+            <i class="fa-solid fa-heart-circle-arrow-up text-xl mb-0.5"></i>
+            <span>Descubrir</span>
+        </button>
+        <button onclick="cambiarPestaña('matches')" class="flex flex-col items-center text-slate-400 hover:text-white text-xs">
+            <i class="fa-solid fa-comments text-xl mb-0.5"></i>
+            <span>Matches</span>
+        </button>
+        <button onclick="abrirModalCrearPerfil()" class="flex flex-col items-center text-slate-400 hover:text-white text-xs">
+            <i class="fa-solid fa-user text-xl mb-0.5"></i>
+            <span>Mi Perfil</span>
+        </button>
+    </nav>
+
+    <!-- Modal: Crear Perfil con Galería Completa -->
     <div id="modal-crear" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="cerrarModalCrearPerfil()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-lg font-bold text-white mb-4">Crear Perfil en TucuMatch</h3>
+            <h3 class="text-lg font-bold text-white mb-4">Crear Mi Perfil</h3>
             
             <form onsubmit="guardarNuevoPerfil(event)" class="space-y-4">
                 <div>
@@ -95,10 +125,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Zona / Localidad de Tucumán</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Localidad de Tucumán</label>
                     <select id="nuevo-barrio" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-rose-500">
-                        <option value="">Selecciona tu zona...</option>
-                        <!-- Capital y Zonas Urbanas -->
+                        <option value="">Seleccioná tu localidad...</option>
                         <option value="San Miguel de Tucumán - Centro">San Miguel de Tucumán (Centro)</option>
                         <option value="San Miguel de Tucumán - Barrio Norte">San Miguel de Tucumán (Barrio Norte)</option>
                         <option value="San Miguel de Tucumán - Barrio Sur">San Miguel de Tucumán (Barrio Sur)</option>
@@ -107,7 +136,6 @@
                         <option value="Banda del Río Salí">Banda del Río Salí</option>
                         <option value="Alderetes">Alderetes</option>
                         <option value="Las Talitas">Las Talitas</option>
-                        <!-- Oeste y Valles -->
                         <option value="Tafí del Valle">Tafí del Valle</option>
                         <option value="El Mollar">El Mollar</option>
                         <option value="San Javier">San Javier / Villa Nougués</option>
@@ -116,8 +144,7 @@
                         <option value="Monteros">Monteros</option>
                         <option value="Concepción">Concepción</option>
                         <option value="Aguilares">Aguilares</option>
-                        <option value="Jalbardín / Alberdi">Juan Bautista Alberdi</option>
-                        <!-- Este y Sur -->
+                        <option value="Juan Bautista Alberdi">Juan Bautista Alberdi</option>
                         <option value="Bella Vista">Bella Vista</option>
                         <option value="Simoca">Simoca</option>
                         <option value="Trancas">Trancas</option>
@@ -128,74 +155,143 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Foto de Perfil (Subir desde la Galería)</label>
-                    <input type="file" id="nueva-foto" accept="image/*" required onchange="previsualizarImagen(event)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-500 cursor-pointer">
-                    <div id="preview-container" class="mt-2 hidden">
-                        <img id="img-preview" class="w-full h-40 object-cover rounded-lg border border-slate-700">
-                    </div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Fotos (Seleccioná 1 o más desde la Galería)</label>
+                    <input type="file" id="nuevas-fotos" accept="image/*" multiple required onchange="previsualizarImagenes(event)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white cursor-pointer">
+                    <div id="preview-grid" class="mt-3 grid grid-cols-3 gap-2 hidden"></div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Bio / Presentación</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Bio / Sobre vos</label>
                     <textarea id="nueva-bio" rows="3" placeholder="Contá un poco sobre vos..." class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-rose-500"></textarea>
                 </div>
 
-                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl transition">Guardar Perfil</button>
+                <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:brightness-110 text-white font-bold py-3 rounded-xl transition shadow-lg">Guardar Perfil</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Filtros -->
+    <div id="modal-filtros" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative">
+            <button onclick="cerrarModalFiltros()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-4">Filtros de Búsqueda</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Filtrar por Localidad</label>
+                    <select id="filtro-barrio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                        <option value="todas">Todas las localidades de Tucumán</option>
+                        <option value="Yerba Buena">Yerba Buena</option>
+                        <option value="San Miguel de Tucumán">San Miguel de Tucumán</option>
+                        <option value="Tafí Viejo">Tafí Viejo</option>
+                        <option value="Concepción">Concepción</option>
+                        <option value="Tafí del Valle">Tafí del Valle</option>
+                    </select>
+                </div>
+                <button onclick="aplicarFiltros()" class="w-full bg-rose-600 text-white font-bold py-2.5 rounded-xl">Aplicar Filtros</button>
+            </div>
         </div>
     </div>
 
     <script>
         let perfiles = [];
-        let indexActual = 0;
-        let fotoCargadaBase64 = "";
+        let indexPerfil = 0;
+        let fotoIndex = 0;
+        let fotosCargadasBase64 = [];
 
         async function cargarPerfiles() {
             try {
                 const res = await fetch('/api/profiles');
                 perfiles = await res.json();
                 mostrarPerfil(0);
-            } catch (e) {
-                console.log("Error cargando perfiles", e);
-            }
+            } catch (e) { console.log("Error al cargar perfiles", e); }
         }
 
         function mostrarPerfil(idx) {
-            if (!perfiles || perfiles.length === 0 || idx >= perfiles.length) {
-                indexActual = 0;
-            }
-            const p = perfiles[indexActual];
+            if (!perfiles || perfiles.length === 0) return;
+            if (idx >= perfiles.length) indexPerfil = 0;
+            
+            fotoIndex = 0;
+            const p = perfiles[indexPerfil];
             document.getElementById('profile-nombre').innerText = p.nombre;
             document.getElementById('profile-edad').innerText = p.edad;
             document.getElementById('profile-barrio').innerText = p.barrio;
             document.getElementById('profile-bio').innerText = p.bio || "¡Sin bio disponible!";
-            document.getElementById('profile-img').src = p.fotos[0];
             
+            actualizarFotoYDots();
+
             const badge = document.getElementById('badge-verificado');
             if (p.verificado) badge.classList.remove('hidden');
             else badge.classList.add('hidden');
         }
 
-        function siguientePerfil() {
-            indexActual = (indexActual + 1) % perfiles.length;
-            mostrarPerfil(indexActual);
+        function actualizarFotoYDots() {
+            const p = perfiles[indexPerfil];
+            const fotos = p.fotos && p.fotos.length > 0 ? p.fotos : ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500"];
+            
+            document.getElementById('profile-img').src = fotos[fotoIndex];
+
+            // Renderizar indicadores de fotos
+            const dotsContainer = document.getElementById('gallery-dots');
+            dotsContainer.innerHTML = '';
+            fotos.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = `h-1 flex-1 rounded-full transition-all ${i === fotoIndex ? 'bg-white opacity-100' : 'bg-white/40'}`;
+                dotsContainer.appendChild(dot);
+            });
         }
 
-        function previsualizarImagen(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    fotoCargadaBase64 = e.target.result;
-                    document.getElementById('img-preview').src = fotoCargadaBase64;
-                    document.getElementById('preview-container').classList.remove('hidden');
-                }
-                reader.readAsDataURL(file);
+        function fotoSiguiente() {
+            const p = perfiles[indexPerfil];
+            if (p.fotos && fotoIndex < p.fotos.length - 1) {
+                fotoIndex++;
+                actualizarFotoYDots();
+            }
+        }
+
+        function fotoAnterior() {
+            if (fotoIndex > 0) {
+                fotoIndex--;
+                actualizarFotoYDots();
+            }
+        }
+
+        function siguientePerfil() {
+            indexPerfil = (indexPerfil + 1) % perfiles.length;
+            mostrarPerfil(indexPerfil);
+        }
+
+        function darLike() {
+            alert(`¡Le diste Me Gusta a ${perfiles[indexPerfil].nombre}! 🎉`);
+            siguientePerfil();
+        }
+
+        function previsualizarImagenes(event) {
+            const files = event.target.files;
+            fotosCargadasBase64 = [];
+            const grid = document.getElementById('preview-grid');
+            grid.innerHTML = '';
+            
+            if (files.length > 0) {
+                grid.classList.remove('hidden');
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        fotosCargadasBase64.push(e.target.result);
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'w-full h-20 object-cover rounded-lg border border-slate-700';
+                        grid.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
             }
         }
 
         function abrirModalCrearPerfil() { document.getElementById('modal-crear').classList.remove('hidden'); }
         function cerrarModalCrearPerfil() { document.getElementById('modal-crear').classList.add('hidden'); }
+        function abrirModalFiltros() { document.getElementById('modal-filtros').classList.remove('hidden'); }
+        function cerrarModalFiltros() { document.getElementById('modal-filtros').classList.add('hidden'); }
 
         function guardarNuevoPerfil(e) {
             e.preventDefault();
@@ -206,14 +302,27 @@
                 barrio: document.getElementById('nuevo-barrio').value,
                 bio: document.getElementById('nueva-bio').value,
                 verificado: true,
-                fotos: [fotoCargadaBase64 || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500"]
+                fotos: fotosCargadasBase64.length > 0 ? fotosCargadasBase64 : ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500"]
             };
             
             perfiles.unshift(nuevo);
-            indexActual = 0;
+            indexPerfil = 0;
             mostrarPerfil(0);
             cerrarModalCrearPerfil();
-            alert("¡Perfil creado con éxito!");
+            alert("¡Perfil creado con éxito en TucuMatch!");
+        }
+
+        function aplicarFiltros() {
+            cerrarModalFiltros();
+            alert("Filtros aplicados");
+        }
+
+        function cambiarPestaña(tab) {
+            if (tab === 'descubrir') {
+                mostrarPerfil(indexPerfil);
+            } else if (tab === 'matches') {
+                alert("Sección de Matches y Chats próximamente disponibles");
+            }
         }
 
         window.onload = cargarPerfiles;
