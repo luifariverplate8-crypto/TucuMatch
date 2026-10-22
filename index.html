@@ -23,8 +23,8 @@
             <h1 class="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-rose-500 via-rose-400 to-amber-400">TucuMatch</h1>
         </div>
         <div class="flex items-center space-x-2">
-            <button onclick="abrirModalFiltros()" class="p-2 rounded-full bg-slate-800 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold">
-                <i class="fa-solid fa-sliders"></i>
+            <button onclick="abrirVerificacion()" class="px-2.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500/30">
+                <i class="fa-solid fa-shield-halved mr-1"></i>Verificar
             </button>
             <button onclick="abrirModalCrearPerfil()" class="px-3 py-1.5 rounded-full bg-rose-600 hover:bg-rose-500 text-xs font-semibold text-white transition flex items-center">
                 <i class="fa-solid fa-plus mr-1"></i> Perfil
@@ -40,22 +40,16 @@
             <div class="relative h-96 w-full bg-slate-800">
                 <img id="profile-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500" class="w-full h-full object-cover transition-all duration-300" alt="Perfil">
                 
-                <!-- Indicador de Galería -->
-                <div id="gallery-dots" class="absolute top-2 w-full flex justify-center space-x-1.5 px-4 z-10">
-                    <div class="h-1 flex-1 bg-white rounded-full opacity-90"></div>
-                </div>
+                <div id="gallery-dots" class="absolute top-2 w-full flex justify-center space-x-1.5 px-4 z-10"></div>
 
-                <!-- Botones para cambiar foto -->
                 <button onclick="fotoAnterior()" class="absolute left-0 top-0 bottom-0 w-1/3 z-10 focus:outline-none"></button>
                 <button onclick="fotoSiguiente()" class="absolute right-0 top-0 bottom-0 w-1/3 z-10 focus:outline-none"></button>
 
-                <!-- Badge de Zona -->
                 <div class="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-amber-400 border border-amber-500/30 flex items-center z-20">
                     <i class="fa-solid fa-location-dot mr-1.5 text-rose-400"></i>
                     <span id="profile-barrio">Yerba Buena</span>
                 </div>
 
-                <!-- Badge Verificado -->
                 <div id="badge-verificado" class="absolute top-4 right-3 bg-emerald-500/90 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow flex items-center z-20">
                     <i class="fa-solid fa-circle-check mr-1"></i> Verificado
                 </div>
@@ -67,21 +61,21 @@
                     <div class="flex items-baseline justify-between mb-2">
                         <h2 class="text-2xl font-bold text-white"><span id="profile-nombre">Lucía</span>, <span id="profile-edad" class="text-slate-400 font-normal">24</span></h2>
                     </div>
-                    <p id="profile-bio" class="text-slate-300 text-sm leading-relaxed mb-4">Amante del cerro San Javier y el sanguchazo de milanesa con todo 🥪</p>
+                    <p id="profile-bio" class="text-slate-300 text-sm leading-relaxed mb-4"></p>
                     
-                    <!-- Rompehielos Tucumano -->
+                    <!-- Trivia / Rompehielos -->
                     <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50 mb-2">
-                        <p class="text-xs text-rose-400 font-bold uppercase tracking-wider mb-1">Pregunta Tucumana:</p>
-                        <p class="text-xs text-slate-200 font-medium">¿Sanguche de milanesa en primera cita es buen plan o red flag?</p>
+                        <p id="profile-pregunta" class="text-xs text-rose-400 font-bold uppercase tracking-wider mb-1"></p>
+                        <p id="profile-respuesta" class="text-xs text-slate-200 font-medium"></p>
                     </div>
                 </div>
 
                 <!-- Botones de Acción -->
                 <div class="flex items-center justify-evenly pt-4">
-                    <button onclick="siguientePerfil()" class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 text-2xl flex items-center justify-center transition shadow-lg active:scale-95">
+                    <button onclick="siguientePerfil()" class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-rose-400 text-2xl flex items-center justify-center transition shadow-lg active:scale-95">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <button onclick="darLike()" class="w-16 h-16 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white text-2xl flex items-center justify-center transition shadow-xl shadow-rose-500/30 active:scale-95 hover:scale-105">
+                    <button onclick="darLike()" class="w-16 h-16 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white text-2xl flex items-center justify-center transition shadow-xl active:scale-95 hover:scale-105">
                         <i class="fa-solid fa-heart-circle-arrow-up text-2xl"></i>
                     </button>
                 </div>
@@ -89,17 +83,14 @@
         </div>
     </main>
 
-    <!-- VISTA 2: Lista de Matches y Chats -->
+    <!-- VISTA 2: Matches -->
     <main id="vista-matches" class="w-full max-w-md p-4 mx-auto flex-1 hidden flex-col">
         <h2 class="text-xl font-bold text-white mb-4">Tus Matches Tucumanos 🎉</h2>
-        <div id="lista-matches" class="space-y-3">
-            <!-- Se completa dinámicamente con JS -->
-        </div>
+        <div id="lista-matches" class="space-y-3"></div>
     </main>
 
-    <!-- VISTA 3: Chat Individual -->
+    <!-- VISTA 3: Chat -->
     <main id="vista-chat" class="w-full max-w-md mx-auto flex-1 hidden flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden h-[75vh]">
-        <!-- Encabezado del Chat -->
         <div class="p-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <button onclick="volverAMatches()" class="text-slate-400 hover:text-white p-1">
@@ -108,26 +99,97 @@
                 <img id="chat-user-img" src="" class="w-10 h-10 rounded-full object-cover border border-rose-500">
                 <div>
                     <h3 id="chat-user-name" class="font-bold text-sm text-white"></h3>
-                    <p id="chat-user-status" class="text-xs text-emerald-400">En línea</p>
+                    <p class="text-xs text-emerald-400">En línea</p>
                 </div>
             </div>
+            <button onclick="sugerirCita()" class="px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-xs font-semibold hover:bg-amber-500/30">
+                <i class="fa-solid fa-location-dot mr-1"></i> Cita Tucumana
+            </button>
         </div>
 
-        <!-- Mensajes -->
-        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm">
-            <!-- Mensajes dinámicos -->
-        </div>
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm"></div>
 
-        <!-- Campo de Texto -->
         <form onsubmit="enviarMensaje(event)" class="p-3 bg-slate-800 border-t border-slate-700 flex items-center space-x-2">
             <input type="text" id="chat-input" placeholder="Escribí un mensaje..." required class="flex-1 bg-slate-900 border border-slate-700 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-rose-500">
-            <button type="submit" class="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center">
+            <button type="submit" class="w-10 h-10 rounded-full bg-rose-600 text-white flex items-center justify-center">
                 <i class="fa-solid fa-paper-plane text-xs"></i>
             </button>
         </form>
     </main>
 
-    <!-- Barra de Navegación Inferior -->
+    <!-- Modal Match Pop-Up -->
+    <div id="modal-match-popup" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center p-6 text-center">
+        <i class="fa-solid fa-heart-circle-bolt text-rose-500 text-6xl heart-pulse mb-4"></i>
+        <h2 class="text-3xl font-black text-white mb-2">¡ES UN MATCH TUCUMANO! 🎉</h2>
+        <p id="popup-match-text" class="text-slate-300 text-sm mb-6"></p>
+        <button onclick="irAChatDesdePopup()" class="w-full max-w-xs bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold py-3 rounded-xl shadow-lg mb-3">Enviar Mensaje</button>
+        <button onclick="cerrarPopupMatch()" class="text-slate-400 text-sm">Seguir viendo perfiles</button>
+    </div>
+
+    <!-- Modal Verificación DNI/Selfie -->
+    <div id="modal-verificacion" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 text-center relative">
+            <button onclick="cerrarVerificacion()" class="absolute top-4 right-4 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <i class="fa-solid fa-id-card text-emerald-400 text-4xl mb-3"></i>
+            <h3 class="text-lg font-bold text-white mb-2">Verificación de Perfil</h3>
+            <p class="text-xs text-slate-400 mb-4">Tomate una selfie para verificar tu identidad y obtener el distintivo oficial verde de TucuMatch.</p>
+            <input type="file" accept="image/*" capture="user" id="selfie-file" class="hidden" onchange="procesarVerificacion()">
+            <button onclick="document.getElementById('selfie-file').click()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl">Tomar Selfie / Subir Foto</button>
+        </div>
+    </div>
+
+    <!-- Modal Crear Perfil -->
+    <div id="modal-crear" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="cerrarModalCrearPerfil()" class="absolute top-4 right-4 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-4">Crear Mi Perfil</h3>
+            
+            <form onsubmit="guardarNuevoPerfil(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Nombre</label>
+                    <input type="text" id="nuevo-nombre" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Edad</label>
+                    <input type="number" id="nueva-edad" min="18" max="99" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Localidad de Tucumán</label>
+                    <select id="nuevo-barrio" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                        <option value="San Miguel de Tucumán - Centro">San Miguel de Tucumán (Centro)</option>
+                        <option value="Yerba Buena">Yerba Buena</option>
+                        <option value="Tafí Viejo">Tafí Viejo</option>
+                        <option value="Concepción">Concepción</option>
+                        <option value="Tafí del Valle">Tafí del Valle</option>
+                        <option value="Monteros">Monteros</option>
+                        <option value="Famaillá">Famaillá</option>
+                        <option value="Lules">Lules</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Rompehielos Tucumano</label>
+                    <select id="nueva-pregunta" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white mb-2">
+                        <option value="¿Sanguche de milanesa en primera cita?">¿Sanguche de milanesa en primera cita?</option>
+                        <option value="¿Empanada tucumana con limón?">¿Empanada tucumana con limón?</option>
+                        <option value="¿Mejor lugar para merendar?">¿Mejor lugar para merendar?</option>
+                    </select>
+                    <input type="text" id="nueva-respuesta" placeholder="Tu respuesta..." required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Fotos (Galería)</label>
+                    <input type="file" id="nuevas-fotos" accept="image/*" multiple required onchange="previsualizarImagenes(event)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-rose-600 file:text-white cursor-pointer">
+                    <div id="preview-grid" class="mt-3 grid grid-cols-3 gap-2 hidden"></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Bio / Presentación</label>
+                    <textarea id="nueva-bio" rows="2" placeholder="Contá sobre vos..." class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold py-3 rounded-xl">Guardar Perfil</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navegación Inferior -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 py-2 z-40 max-w-md mx-auto flex justify-around items-center">
         <button id="nav-descubrir" onclick="cambiarPestaña('descubrir')" class="flex flex-col items-center text-rose-500 font-semibold text-xs">
             <i class="fa-solid fa-heart-circle-arrow-up text-xl mb-0.5"></i>
@@ -144,104 +206,9 @@
         </button>
     </nav>
 
-    <!-- Modal: Crear Perfil con Galería Completa -->
-    <div id="modal-crear" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="cerrarModalCrearPerfil()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-lg font-bold text-white mb-4">Crear Mi Perfil</h3>
-            
-            <form onsubmit="guardarNuevoPerfil(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Nombre</label>
-                    <input type="text" id="nuevo-nombre" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-rose-500">
-                </div>
-                
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Edad</label>
-                    <input type="number" id="nueva-edad" min="18" max="99" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-rose-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Localidad de Tucumán</label>
-                    <select id="nuevo-barrio" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-rose-500">
-                        <option value="">Seleccioná tu localidad...</option>
-                        <option value="San Miguel de Tucumán - Centro">San Miguel de Tucumán (Centro)</option>
-                        <option value="San Miguel de Tucumán - Barrio Norte">San Miguel de Tucumán (Barrio Norte)</option>
-                        <option value="San Miguel de Tucumán - Barrio Sur">San Miguel de Tucumán (Barrio Sur)</option>
-                        <option value="Yerba Buena">Yerba Buena</option>
-                        <option value="Tafí Viejo">Tafí Viejo</option>
-                        <option value="Banda del Río Salí">Banda del Río Salí</option>
-                        <option value="Alderetes">Alderetes</option>
-                        <option value="Las Talitas">Las Talitas</option>
-                        <option value="Tafí del Valle">Tafí del Valle</option>
-                        <option value="El Mollar">El Mollar</option>
-                        <option value="San Javier">San Javier / Villa Nougués</option>
-                        <option value="Lules">Lules</option>
-                        <option value="Famaillá">Famaillá</option>
-                        <option value="Monteros">Monteros</option>
-                        <option value="Concepción">Concepción</option>
-                        <option value="Aguilares">Aguilares</option>
-                        <option value="Juan Bautista Alberdi">Juan Bautista Alberdi</option>
-                        <option value="Bella Vista">Bella Vista</option>
-                        <option value="Simoca">Simoca</option>
-                        <option value="Trancas">Trancas</option>
-                        <option value="Burruyacú">Burruyacú</option>
-                        <option value="La Cocha">La Cocha</option>
-                        <option value="Graneros">Graneros</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Fotos (Seleccioná 1 o más desde la Galería)</label>
-                    <input type="file" id="nuevas-fotos" accept="image/*" multiple required onchange="previsualizarImagenes(event)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white cursor-pointer">
-                    <div id="preview-grid" class="mt-3 grid grid-cols-3 gap-2 hidden"></div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Bio / Sobre vos</label>
-                    <textarea id="nueva-bio" rows="3" placeholder="Contá un poco sobre vos..." class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-rose-500"></textarea>
-                </div>
-
-                <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:brightness-110 text-white font-bold py-3 rounded-xl transition shadow-lg">Guardar Perfil</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Filtros -->
-    <div id="modal-filtros" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative">
-            <button onclick="cerrarModalFiltros()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-lg font-bold text-white mb-4">Filtros de Búsqueda</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Filtrar por Localidad</label>
-                    <select id="filtro-barrio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
-                        <option value="todas">Todas las localidades de Tucumán</option>
-                        <option value="Yerba Buena">Yerba Buena</option>
-                        <option value="San Miguel de Tucumán">San Miguel de Tucumán</option>
-                        <option value="Tafí Viejo">Tafí Viejo</option>
-                        <option value="Concepción">Concepción</option>
-                    </select>
-                </div>
-                <button onclick="aplicarFiltros()" class="w-full bg-rose-600 text-white font-bold py-2.5 rounded-xl">Aplicar Filtros</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         let perfiles = [];
-        let matches = [
-            {
-                id: 99,
-                nombre: "Camila",
-                barrio: "Barrio Norte",
-                foto: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500",
-                mensajes: [
-                    { emisor: "otro", texto: "¡Hola! ¿Cómo estás? ¿Sos de Capital?" },
-                    { emisor: "yo", texto: "¡Buenas! Sí, de Tucumán. ¿Vos?" }
-                ]
-            }
-        ];
+        let matches = [];
         let indexPerfil = 0;
         let fotoIndex = 0;
         let fotosCargadasBase64 = [];
@@ -252,8 +219,7 @@
                 const res = await fetch('/api/profiles');
                 perfiles = await res.json();
                 mostrarPerfil(0);
-                actualizarBadgeMatches();
-            } catch (e) { console.log("Error al cargar perfiles", e); }
+            } catch (e) { console.log(e); }
         }
 
         function mostrarPerfil(idx) {
@@ -266,6 +232,8 @@
             document.getElementById('profile-edad').innerText = p.edad;
             document.getElementById('profile-barrio').innerText = p.barrio;
             document.getElementById('profile-bio').innerText = p.bio || "¡Sin bio disponible!";
+            document.getElementById('profile-pregunta').innerText = p.pregunta || "Pregunta Tucumana:";
+            document.getElementById('profile-respuesta').innerText = p.respuesta || "¡Buen plan!";
             
             actualizarFotoYDots();
 
@@ -291,17 +259,11 @@
 
         function fotoSiguiente() {
             const p = perfiles[indexPerfil];
-            if (p.fotos && fotoIndex < p.fotos.length - 1) {
-                fotoIndex++;
-                actualizarFotoYDots();
-            }
+            if (p.fotos && fotoIndex < p.fotos.length - 1) { fotoIndex++; actualizarFotoYDots(); }
         }
 
         function fotoAnterior() {
-            if (fotoIndex > 0) {
-                fotoIndex--;
-                actualizarFotoYDots();
-            }
+            if (fotoIndex > 0) { fotoIndex--; actualizarFotoYDots(); }
         }
 
         function siguientePerfil() {
@@ -310,11 +272,200 @@
         }
 
         function darLike() {
-            const perfilActual = perfiles[indexPerfil];
-            
-            // Agregar automáticamente a Matches
+            const p = perfiles[indexPerfil];
             const nuevoMatch = {
-                id: perfilActual.id,
-                nombre: perfilActual.nombre,
-                barrio: perfilActual.barrio,
-                foto:
+                id: p.id,
+                nombre: p.nombre,
+                barrio: p.barrio,
+                foto: p.fotos[0],
+                mensajes: [{ emisor: "otro", texto: `¡Hola! ¡Hicimos Match! 🎉 ¿Qué tal unas empanadas o sanguche en ${p.barrio}?` }]
+            };
+
+            if (!matches.some(m => m.id === nuevoMatch.id)) { matches.unshift(nuevoMatch); }
+
+            actualizarBadgeMatches();
+            
+            // Pop-Up Match
+            matchActivo = nuevoMatch;
+            document.getElementById('popup-match-text').innerText = `A ${p.nombre} también le gustaste.`;
+            document.getElementById('modal-match-popup').classList.remove('hidden');
+        }
+
+        function irAChatDesdePopup() {
+            cerrarPopupMatch();
+            cambiarPestaña('matches');
+            abrirChat(matchActivo);
+        }
+
+        function cerrarPopupMatch() {
+            document.getElementById('modal-match-popup').classList.add('hidden');
+            siguientePerfil();
+        }
+
+        function cambiarPestaña(tab) {
+            document.getElementById('vista-descubrir').classList.add('hidden');
+            document.getElementById('vista-matches').classList.add('hidden');
+            document.getElementById('vista-chat').classList.add('hidden');
+
+            if (tab === 'descubrir') document.getElementById('vista-descubrir').classList.remove('hidden');
+            else if (tab === 'matches') {
+                document.getElementById('vista-matches').classList.remove('hidden');
+                renderizarListaMatches();
+            }
+        }
+
+        function renderizarListaMatches() {
+            const cont = document.getElementById('lista-matches');
+            cont.innerHTML = '';
+            if (matches.length === 0) {
+                cont.innerHTML = `<p class="text-slate-400 text-sm text-center py-8">No tenés matches aún. ¡Dale Me Gusta a perfiles!</p>`;
+                return;
+            }
+            matches.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-900 border border-slate-800 p-3 rounded-2xl flex items-center justify-between cursor-pointer hover:border-rose-500/50';
+                div.onclick = () => abrirChat(m);
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <img src="${m.foto}" class="w-12 h-12 rounded-full object-cover border border-rose-500">
+                        <div>
+                            <h4 class="font-bold text-white text-sm">${m.nombre} <span class="text-xs font-normal text-slate-400">(${m.barrio})</span></h4>
+                            <p class="text-xs text-slate-400 line-clamp-1">${m.mensajes[m.mensajes.length - 1].texto}</p>
+                        </div>
+                    </div>
+                `;
+                cont.appendChild(div);
+            });
+        }
+
+        function abrirChat(match) {
+            matchActivo = match;
+            document.getElementById('vista-matches').classList.add('hidden');
+            document.getElementById('vista-chat').classList.remove('hidden');
+            document.getElementById('chat-user-img').src = match.foto;
+            document.getElementById('chat-user-name').innerText = match.nombre;
+            renderizarMensajes();
+        }
+
+        function volverAMatches() {
+            document.getElementById('vista-chat').classList.add('hidden');
+            document.getElementById('vista-matches').classList.remove('hidden');
+        }
+
+        function renderizarMensajes() {
+            const cont = document.getElementById('chat-messages');
+            cont.innerHTML = '';
+            matchActivo.mensajes.forEach(msg => {
+                const esYo = msg.emisor === 'yo';
+                const div = document.createElement('div');
+                div.className = `flex ${esYo ? 'justify-end' : 'justify-start'}`;
+                div.innerHTML = `
+                    <div class="max-w-[75%] px-3.5 py-2 rounded-2xl text-xs ${esYo ? 'bg-rose-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700'}">
+                        ${msg.texto}
+                    </div>
+                `;
+                cont.appendChild(div);
+            });
+            cont.scrollTop = cont.scrollHeight;
+        }
+
+        function enviarMensaje(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            matchActivo.mensajes.push({ emisor: 'yo', texto: texto });
+            input.value = '';
+            renderizarMensajes();
+
+            setTimeout(() => {
+                const respuestas = [
+                    "¡De una! ¿Nos encontramos en la Av. Aconquija?",
+                    "¡Totalmente! Sanguche de milanesa con todo siempre 🥪",
+                    "¡Avísame cuando estés libre y coordinamos!"
+                ];
+                matchActivo.mensajes.push({ emisor: 'otro', texto: respuestas[Math.floor(Math.random() * respuestas.length)] });
+                renderizarMensajes();
+            }, 1000);
+        }
+
+        function sugerirCita() {
+            const lugares = [
+                "📍 Cita sugerida: Plaza Independencia / Bar histórico",
+                "📍 Cita sugerida: Merendero en Av. Aconquija (Yerba Buena)",
+                "📍 Cita sugerida: Sanguchería tradicional tucumana 🥪",
+                "📍 Cita sugerida: Paseo por el Cerro San Javier 🌿"
+            ];
+            const sugerencia = lugares[Math.floor(Math.random() * lugares.length)];
+            matchActivo.mensajes.push({ emisor: 'yo', texto: sugerencia });
+            renderizarMensajes();
+        }
+
+        function actualizarBadgeMatches() {
+            const badge = document.getElementById('badge-matches-count');
+            if (matches.length > 0) {
+                badge.innerText = matches.length;
+                badge.classList.remove('hidden');
+            }
+        }
+
+        function abrirVerificacion() { document.getElementById('modal-verificacio').classList.remove('hidden'); }
+        function cerrarVerificacion() { document.getElementById('modal-verificacion').classList.add('hidden'); }
+        
+        function procesarVerificacion() {
+            alert("¡Selfie procesada con éxito! Tu perfil ahora cuenta con el distintivo verificado verde 🛡️.");
+            cerrarVerificacion();
+        }
+
+        function previsualizarImagenes(event) {
+            const files = event.target.files;
+            fotosCargadasBase64 = [];
+            const grid = document.getElementById('preview-grid');
+            grid.innerHTML = '';
+            if (files.length > 0) {
+                grid.classList.remove('hidden');
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        fotosCargadasBase64.push(e.target.result);
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'w-full h-20 object-cover rounded-lg border border-slate-700';
+                        grid.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function abrirModalCrearPerfil() { document.getElementById('modal-crear').classList.remove('hidden'); }
+        function cerrarModalCrearPerfil() { document.getElementById('modal-crear').classList.add('hidden'); }
+
+        async function guardarNuevoPerfil(e) {
+            e.preventDefault();
+            const nuevo = {
+                nombre: document.getElementById('nuevo-nombre').value,
+                edad: parseInt(document.getElementById('nueva-edad').value),
+                barrio: document.getElementById('nuevo-barrio').value,
+                bio: document.getElementById('nueva-bio').value,
+                pregunta: document.getElementById('nueva-pregunta').value,
+                respuesta: document.getElementById('nueva-respuesta').value,
+                fotos: fotosCargadasBase64.length > 0 ? fotosCargadasBase64 : ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500"]
+            };
+
+            await fetch('/api/profiles', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nuevo)
+            });
+
+            await cargarPerfiles();
+            cerrarModalCrearPerfil();
+            alert("¡Perfil guardado en la base de datos de TucuMatch!");
+        }
+
+        window.onload = cargarPerfiles;
+    </script>
+</body>
+</html>
