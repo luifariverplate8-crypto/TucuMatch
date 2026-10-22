@@ -32,20 +32,20 @@
         </div>
     </header>
 
-    <!-- Contenido Principal / Tarjeta de Perfil -->
-    <main class="w-full max-w-md p-4 mx-auto flex-1 flex flex-col justify-center items-center">
+    <!-- VISTA 1: Descubrir (Perfiles) -->
+    <main id="vista-descubrir" class="w-full max-w-md p-4 mx-auto flex-1 flex flex-col justify-center items-center">
         <div id="card-container" class="w-full bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative flex flex-col">
             
             <!-- Galería de Fotos del Perfil -->
             <div class="relative h-96 w-full bg-slate-800">
                 <img id="profile-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500" class="w-full h-full object-cover transition-all duration-300" alt="Perfil">
                 
-                <!-- Indicador de Galería (puntos/fotos) -->
+                <!-- Indicador de Galería -->
                 <div id="gallery-dots" class="absolute top-2 w-full flex justify-center space-x-1.5 px-4 z-10">
                     <div class="h-1 flex-1 bg-white rounded-full opacity-90"></div>
                 </div>
 
-                <!-- Botones para cambiar foto en la galería -->
+                <!-- Botones para cambiar foto -->
                 <button onclick="fotoAnterior()" class="absolute left-0 top-0 bottom-0 w-1/3 z-10 focus:outline-none"></button>
                 <button onclick="fotoSiguiente()" class="absolute right-0 top-0 bottom-0 w-1/3 z-10 focus:outline-none"></button>
 
@@ -71,18 +71,16 @@
                     
                     <!-- Rompehielos Tucumano -->
                     <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50 mb-2">
-                        <p class="text-xs text-rose-400 font-bold uppercase tracking-wider mb-1"> Pregunta Tucumana:</p>
+                        <p class="text-xs text-rose-400 font-bold uppercase tracking-wider mb-1">Pregunta Tucumana:</p>
                         <p class="text-xs text-slate-200 font-medium">¿Sanguche de milanesa en primera cita es buen plan o red flag?</p>
                     </div>
                 </div>
 
                 <!-- Botones de Acción -->
                 <div class="flex items-center justify-evenly pt-4">
-                    <!-- Botón Rechazar -->
                     <button onclick="siguientePerfil()" class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 text-2xl flex items-center justify-center transition shadow-lg active:scale-95">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <!-- Botón Me Gusta (Corazón con Flecha) -->
                     <button onclick="darLike()" class="w-16 h-16 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white text-2xl flex items-center justify-center transition shadow-xl shadow-rose-500/30 active:scale-95 hover:scale-105">
                         <i class="fa-solid fa-heart-circle-arrow-up text-2xl"></i>
                     </button>
@@ -91,15 +89,54 @@
         </div>
     </main>
 
+    <!-- VISTA 2: Lista de Matches y Chats -->
+    <main id="vista-matches" class="w-full max-w-md p-4 mx-auto flex-1 hidden flex-col">
+        <h2 class="text-xl font-bold text-white mb-4">Tus Matches Tucumanos 🎉</h2>
+        <div id="lista-matches" class="space-y-3">
+            <!-- Se completa dinámicamente con JS -->
+        </div>
+    </main>
+
+    <!-- VISTA 3: Chat Individual -->
+    <main id="vista-chat" class="w-full max-w-md mx-auto flex-1 hidden flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden h-[75vh]">
+        <!-- Encabezado del Chat -->
+        <div class="p-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <button onclick="volverAMatches()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <img id="chat-user-img" src="" class="w-10 h-10 rounded-full object-cover border border-rose-500">
+                <div>
+                    <h3 id="chat-user-name" class="font-bold text-sm text-white"></h3>
+                    <p id="chat-user-status" class="text-xs text-emerald-400">En línea</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensajes -->
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm">
+            <!-- Mensajes dinámicos -->
+        </div>
+
+        <!-- Campo de Texto -->
+        <form onsubmit="enviarMensaje(event)" class="p-3 bg-slate-800 border-t border-slate-700 flex items-center space-x-2">
+            <input type="text" id="chat-input" placeholder="Escribí un mensaje..." required class="flex-1 bg-slate-900 border border-slate-700 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-rose-500">
+            <button type="submit" class="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+        </form>
+    </main>
+
     <!-- Barra de Navegación Inferior -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 py-2 z-40 max-w-md mx-auto flex justify-around items-center">
-        <button onclick="cambiarPestaña('descubrir')" class="flex flex-col items-center text-rose-500 font-semibold text-xs">
+        <button id="nav-descubrir" onclick="cambiarPestaña('descubrir')" class="flex flex-col items-center text-rose-500 font-semibold text-xs">
             <i class="fa-solid fa-heart-circle-arrow-up text-xl mb-0.5"></i>
             <span>Descubrir</span>
         </button>
-        <button onclick="cambiarPestaña('matches')" class="flex flex-col items-center text-slate-400 hover:text-white text-xs">
+        <button id="nav-matches" onclick="cambiarPestaña('matches')" class="flex flex-col items-center text-slate-400 hover:text-white text-xs relative">
             <i class="fa-solid fa-comments text-xl mb-0.5"></i>
             <span>Matches</span>
+            <span id="badge-matches-count" class="absolute -top-1 right-2 bg-rose-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
         </button>
         <button onclick="abrirModalCrearPerfil()" class="flex flex-col items-center text-slate-400 hover:text-white text-xs">
             <i class="fa-solid fa-user text-xl mb-0.5"></i>
@@ -175,7 +212,6 @@
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative">
             <button onclick="cerrarModalFiltros()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             <h3 class="text-lg font-bold text-white mb-4">Filtros de Búsqueda</h3>
-            
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1">Filtrar por Localidad</label>
@@ -185,7 +221,6 @@
                         <option value="San Miguel de Tucumán">San Miguel de Tucumán</option>
                         <option value="Tafí Viejo">Tafí Viejo</option>
                         <option value="Concepción">Concepción</option>
-                        <option value="Tafí del Valle">Tafí del Valle</option>
                     </select>
                 </div>
                 <button onclick="aplicarFiltros()" class="w-full bg-rose-600 text-white font-bold py-2.5 rounded-xl">Aplicar Filtros</button>
@@ -195,15 +230,29 @@
 
     <script>
         let perfiles = [];
+        let matches = [
+            {
+                id: 99,
+                nombre: "Camila",
+                barrio: "Barrio Norte",
+                foto: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500",
+                mensajes: [
+                    { emisor: "otro", texto: "¡Hola! ¿Cómo estás? ¿Sos de Capital?" },
+                    { emisor: "yo", texto: "¡Buenas! Sí, de Tucumán. ¿Vos?" }
+                ]
+            }
+        ];
         let indexPerfil = 0;
         let fotoIndex = 0;
         let fotosCargadasBase64 = [];
+        let matchActivo = null;
 
         async function cargarPerfiles() {
             try {
                 const res = await fetch('/api/profiles');
                 perfiles = await res.json();
                 mostrarPerfil(0);
+                actualizarBadgeMatches();
             } catch (e) { console.log("Error al cargar perfiles", e); }
         }
 
@@ -231,7 +280,6 @@
             
             document.getElementById('profile-img').src = fotos[fotoIndex];
 
-            // Renderizar indicadores de fotos
             const dotsContainer = document.getElementById('gallery-dots');
             dotsContainer.innerHTML = '';
             fotos.forEach((_, i) => {
@@ -262,70 +310,11 @@
         }
 
         function darLike() {
-            alert(`¡Le diste Me Gusta a ${perfiles[indexPerfil].nombre}! 🎉`);
-            siguientePerfil();
-        }
-
-        function previsualizarImagenes(event) {
-            const files = event.target.files;
-            fotosCargadasBase64 = [];
-            const grid = document.getElementById('preview-grid');
-            grid.innerHTML = '';
+            const perfilActual = perfiles[indexPerfil];
             
-            if (files.length > 0) {
-                grid.classList.remove('hidden');
-                Array.from(files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        fotosCargadasBase64.push(e.target.result);
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = 'w-full h-20 object-cover rounded-lg border border-slate-700';
-                        grid.appendChild(img);
-                    }
-                    reader.readAsDataURL(file);
-                });
-            }
-        }
-
-        function abrirModalCrearPerfil() { document.getElementById('modal-crear').classList.remove('hidden'); }
-        function cerrarModalCrearPerfil() { document.getElementById('modal-crear').classList.add('hidden'); }
-        function abrirModalFiltros() { document.getElementById('modal-filtros').classList.remove('hidden'); }
-        function cerrarModalFiltros() { document.getElementById('modal-filtros').classList.add('hidden'); }
-
-        function guardarNuevoPerfil(e) {
-            e.preventDefault();
-            const nuevo = {
-                id: Date.now(),
-                nombre: document.getElementById('nuevo-nombre').value,
-                edad: document.getElementById('nueva-edad').value,
-                barrio: document.getElementById('nuevo-barrio').value,
-                bio: document.getElementById('nueva-bio').value,
-                verificado: true,
-                fotos: fotosCargadasBase64.length > 0 ? fotosCargadasBase64 : ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500"]
-            };
-            
-            perfiles.unshift(nuevo);
-            indexPerfil = 0;
-            mostrarPerfil(0);
-            cerrarModalCrearPerfil();
-            alert("¡Perfil creado con éxito en TucuMatch!");
-        }
-
-        function aplicarFiltros() {
-            cerrarModalFiltros();
-            alert("Filtros aplicados");
-        }
-
-        function cambiarPestaña(tab) {
-            if (tab === 'descubrir') {
-                mostrarPerfil(indexPerfil);
-            } else if (tab === 'matches') {
-                alert("Sección de Matches y Chats próximamente disponibles");
-            }
-        }
-
-        window.onload = cargarPerfiles;
-    </script>
-</body>
-</html>
+            // Agregar automáticamente a Matches
+            const nuevoMatch = {
+                id: perfilActual.id,
+                nombre: perfilActual.nombre,
+                barrio: perfilActual.barrio,
+                foto:
