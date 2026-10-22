@@ -1,12 +1,13 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
+from typing import List, Optional
 import sqlite3
 import os
 
 app = FastAPI(title="TucuMatch API")
 
-# Permitir peticiones desde cualquier origen (CORS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,7 +16,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Inicializar Base de Datos SQLite
+class ProfileCreate(BaseModel):
+    nombre: str
+    edad: int
+    barrio: str
+    bio: str
+    pregunta: Optional[str] = "Sanguche de milanesa en primera cita:"
+    respuesta: Optional[str] = "¡Buen plan!"
+    fotos: List[str]
+
 def init_db():
     conn = sqlite3.connect("tucumatch.db")
     cursor = conn.cursor()
@@ -26,14 +35,10 @@ def init_db():
             edad INTEGER NOT NULL,
             barrio TEXT NOT NULL,
             bio TEXT,
-            verificado INTEGER DEFAULT 0
-        )
-    """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS matches (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            matched_user_id INTEGER
+            pregunta TEXT,
+            respuesta TEXT,
+            verificado INTEGER DEFAULT 1,
+            fotos TEXT NOT NULL
         )
     """)
     conn.commit()
@@ -41,65 +46,72 @@ def init_db():
 
 init_db()
 
-# Ruta raíz: sirve directamente la interfaz visual (index.html)
 @app.get("/")
 def read_root():
     if os.path.exists("index.html"):
         return FileResponse("index.html")
-    return {"message": "TucuMatch Backend Online - Archivo index.html no encontrado"}
+    return {"message": "TucuMatch Backend Online"}
 
-# Obtener perfiles para descubrir
 @app.get("/api/profiles")
 def get_profiles():
-    # Perfiles de prueba iniciales para Tucumán
-    profiles = [
-        {
-            "id": 1,
-            "nombre": "Lucía",
-            "edad": 24,
-            "barrio": "Yerba Buena",
-            "bio": "Amante del cerro San Javier y el sanguchazo de milanesa con todo 🥪",
-            "verificado": True,
-            "fotos": ["https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500"]
-        },
-        {
-            "id": 2,
-            "nombre": "Gonzalo",
-            "edad": 27,
-            "barrio": "Barrio Norte",
-            "bio": "Café en la plaza San Martín los domingos y mates en el parque 🌿",
-            "verificado": True,
-            "fotos": ["https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500"]
-        },
-        {
-            "id": 3,
-            "nombre": "Sofía",
-            "edad": 22,
-            "barrio": "Barrio Sur",
-            "bio": "Estudiante de UNT. ¿Sanguche de milanesa en primera cita es buen plan o red flag?",
-            "verificado": False,
-            "fotos": ["https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500"]
-        }
-    ]
-    return profiles
+    conn = sqlite3.connect("tucumatch.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nombre, edad, barrio, bio, pregunta, respuesta, verificado, fotos FROM users ORDER BY id DESC")
+    rows = cursor.fetchall()
+    conn.close()
 
-# Endpoint para verificación por Selfie
-@app.post("/api/verify")
-async def verify_user(selfie: UploadFile = File(...)):
-    # Simulación de verificación instantánea
-    return {
-        "status": "success",
-        "message": "¡Selfie recibida y perfil verificado exitosamente!",
-        "verified": True
-    }
+    if not rows:
+        # Perfiles iniciales si la BD está vacía
+        return [
+            {
+                "id": 1,
+                "nombre": "Lucía",
+                "edad": 24,
+                "barrio": "Yerba Buena",
+                "bio": "Amante del cerro San Javier y el sanguchazo de milanesa con todo 🥪",
+                "pregunta": "¿Sanguche de milanesa en primera cita?",
+                "respuesta": "¡Buen plan de una!",
+                "verificado": True,
+                "fotos": ["https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500"]
+            },
+            {
+                "id": 2,
+                "nombre": "Gonzalo",
+                "edad": 27,
+                "barrio": "Barrio Norte",
+                "bio": "Café en la plaza San Martín los domingos y mates en el parque 🌿",
+                "pregunta": "¿Empanada tucumana con limón?",
+                "respuesta": "Sí, obligatorio 🍋",
+                "verificado": True,
+                "fotos": ["https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500"]
+            }
+        ]
 
-# Endpoint para dar Like / Match
-@app.post("/api/like/{profile_id}")
-def like_profile(profile_id: int):
-    # Simulación de Match automático para pruebas
-    is_match = profile_id in [1, 2]
-    return {
-        "status": "success",
-        "match": is_match,
-        "message": "¡Es un Match Tucumano! 🎉" if is_match else "Like enviado"
-    }
+    result = []
+    for r in rows:
+        result.append({
+            "id": r[0],
+            "nombre": r[1],
+            "edad": r[2],
+            "barrio": r[3],
+            "bio": r[4],
+            "pregunta": r[5],
+            "respuesta": r[6],
+            "verificado": bool(r[7]),
+            "fotos": r[8].split("|||")
+        })
+    return result
+
+@app.post("/api/profiles")
+def create_profile(profile: ProfileCreate):
+    conn = sqlite3.connect("tucumatch.db")
+    cursor = conn.cursor()
+    fotos_str = "|||".join(profile.fotos)
+    cursor.execute("""
+        INSERT INTO users (nombre, edad, barrio, bio, pregunta, respuesta, verificado, fotos)
+        VALUES (?, ?, ?, ?, ?, ?, 1, ?)
+    """, (profile.nombre, profile.edad, profile.barrio, profile.bio, profile.pregunta, profile.respuesta, fotos_str))
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
+    return {"status": "success", "id": new_id}
