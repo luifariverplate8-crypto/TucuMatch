@@ -2,103 +2,125 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TucuMatch - Citas y Encuentros en Tucumán</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TucuMatch - La App de Citas de Tucumán</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        @keyframes heartPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
-        .animate-heart { animation: heartPulse 1.8s infinite; }
-        .glass-card {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
+        .card-swipe {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            will-change: transform, opacity;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-btn {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(244, 63, 94, 0.7); }
+        }
+        .glow-heart { animation: pulseGlow 2s infinite; }
     </style>
 </head>
-<body class="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans antialiased selection:bg-rose-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden antialiased select-none">
 
-    <!-- Header Principal -->
-    <header class="w-full max-w-md mx-auto bg-slate-900/90 backdrop-blur-xl border-b border-slate-800/80 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-2xl">
-        <div class="flex items-center space-x-2.5">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 flex items-center justify-center shadow-lg shadow-rose-500/30">
-                <i class="fa-solid fa-heart-circle-bolt text-white text-lg animate-heart"></i>
+    <!-- BARRA SUPERIOR / HEADER -->
+    <header class="w-full max-w-md mx-auto glass sticky top-0 z-40 px-4 py-3 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-600 via-pink-500 to-amber-400 p-0.5 shadow-lg shadow-rose-500/30">
+                <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                    <i class="fa-solid fa-heart-circle-bolt text-rose-500 text-xl"></i>
+                </div>
             </div>
             <div>
                 <h1 class="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-rose-500 via-pink-400 to-amber-400">TucuMatch</h1>
-                <p class="text-[10px] text-slate-400 font-medium -mt-1">Tucumán & Yerba Buena</p>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest -mt-1">Tucumán</p>
             </div>
         </div>
+
         <div class="flex items-center space-x-2">
-            <button onclick="abrirVerificacion()" class="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500/20 transition flex items-center">
-                <i class="fa-solid fa-shield-halved mr-1.5"></i>Verificar
+            <button onclick="abrirVerificacion()" class="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-500/20 transition flex items-center">
+                <i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i> Verificar
             </button>
-            <button onclick="abrirModalCrearPerfil()" class="px-3 py-1.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-xs font-bold text-white transition shadow-lg shadow-rose-600/30 flex items-center">
-                <i class="fa-solid fa-plus mr-1"></i> Perfil
+            <button onclick="abrirFiltros()" class="w-9 h-9 rounded-full glass-btn text-slate-300 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-sliders text-xs"></i>
             </button>
         </div>
     </header>
 
-    <!-- VISTA 1: Descubrir Perfiles -->
-    <main id="vista-descubrir" class="w-full max-w-md mx-auto p-4 flex-1 flex flex-col justify-center items-center">
-        <div id="card-container" class="w-full bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative flex flex-col my-auto">
+    <!-- VISTA 1: DESCUBRIR (DESLIZADOR Y TARJETAS) -->
+    <main id="vista-descubrir" class="w-full max-w-md mx-auto flex-1 p-4 flex flex-col justify-center items-center relative">
+        
+        <!-- Tarjeta Principal -->
+        <div id="card-main" class="card-swipe w-full bg-slate-900 border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl relative flex flex-col h-[580px] max-h-[80vh]">
             
-            <!-- Galería de Fotos del Perfil -->
-            <div class="relative h-[410px] w-full bg-slate-950 overflow-hidden">
-                <img id="profile-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600" class="w-full h-full object-cover transition-all duration-300" alt="Perfil">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-black/30"></div>
+            <!-- Visor de Fotos con Diapositiva -->
+            <div class="relative flex-1 bg-slate-950 overflow-hidden group">
+                <img id="profile-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600" class="w-full h-full object-cover transition-all duration-300 pointer-events-none" alt="Perfil">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-black/40"></div>
 
-                <!-- Indicadores de Galería -->
-                <div id="gallery-dots" class="absolute top-3 w-full flex justify-center space-x-1.5 px-4 z-20"></div>
+                <!-- Barras de Progreso de Fotos -->
+                <div id="gallery-dots" class="absolute top-3 inset-x-0 flex justify-center space-x-1.5 px-4 z-20"></div>
 
-                <!-- Zonas Táctiles para Foto Anterior/Siguiente -->
+                <!-- Botones Táctiles Foto Anterior / Siguiente -->
                 <button onclick="fotoAnterior()" class="absolute left-0 top-0 bottom-0 w-1/3 z-20 focus:outline-none"></button>
                 <button onclick="fotoSiguiente()" class="absolute right-0 top-0 bottom-0 w-1/3 z-20 focus:outline-none"></button>
 
-                <!-- Ubicación -->
-                <div class="absolute bottom-4 left-4 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-semibold text-amber-300 border border-amber-500/30 flex items-center z-20 shadow-lg">
+                <!-- Badge de Barrio / Zona -->
+                <div class="absolute bottom-4 left-4 bg-slate-950/80 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold text-amber-300 border border-amber-500/30 flex items-center z-20 shadow-xl">
                     <i class="fa-solid fa-location-dot mr-1.5 text-rose-500"></i>
                     <span id="profile-barrio">Yerba Buena</span>
                 </div>
 
                 <!-- Badge Verificado -->
-                <div id="badge-verificado" class="absolute top-4 right-4 bg-emerald-500 text-slate-950 px-3 py-1 rounded-full text-xs font-extrabold shadow-lg flex items-center z-20">
-                    <i class="fa-solid fa-circle-check mr-1 text-slate-950"></i> Verificado
+                <div id="badge-verificado" class="absolute top-4 right-4 bg-emerald-500 text-slate-950 px-3 py-1 rounded-full text-xs font-black shadow-lg flex items-center z-20">
+                    <i class="fa-solid fa-check-double mr-1 text-slate-950"></i> VERIFICADO
                 </div>
             </div>
 
-            <!-- Detalles del Perfil -->
-            <div class="p-5 flex-1 flex flex-col justify-between bg-slate-900">
-                <div>
-                    <div class="flex items-baseline justify-between mb-1.5">
+            <!-- Información del Perfil -->
+            <div class="p-5 bg-slate-900/95 flex flex-col justify-between">
+                <div class="mb-3">
+                    <div class="flex items-baseline justify-between mb-1">
                         <h2 class="text-2xl font-black text-white"><span id="profile-nombre">Lucía</span>, <span id="profile-edad" class="text-slate-400 font-normal">24</span></h2>
                     </div>
                     <p id="profile-bio" class="text-slate-300 text-xs leading-relaxed mb-3">Amante del cerro San Javier y el sanguchazo de milanesa con todo 🥪</p>
                     
-                    <!-- Pregunta Tucumana -->
-                    <div class="bg-slate-800/80 rounded-2xl p-3 border border-slate-700/60 mb-3">
-                        <p id="profile-pregunta" class="text-[11px] text-rose-400 font-bold uppercase tracking-wider mb-1"> Pregunta Tucumana:</p>
-                        <p id="profile-respuesta" class="text-xs text-slate-200 font-medium">¿Sanguche de milanesa en primera cita es buen plan o red flag?</p>
+                    <!-- Rompehielos Tucumano -->
+                    <div class="bg-slate-800/80 rounded-2xl p-3 border border-slate-700/60">
+                        <p id="profile-pregunta" class="text-[10px] text-rose-400 font-black uppercase tracking-wider mb-0.5"> Pregunta Tucumana:</p>
+                        <p id="profile-respuesta" class="text-xs text-slate-200 font-semibold">¿Sanguche de milanesa en primera cita es buen plan o red flag?</p>
                     </div>
                 </div>
 
-                <!-- Botones Principales de Acción -->
-                <div class="flex items-center justify-evenly pt-2 pb-1">
+                <!-- Botones de Acción Estilo Tinder/Bumble -->
+                <div class="flex items-center justify-evenly pt-2">
                     <!-- Rechazar -->
-                    <button onclick="siguientePerfil()" class="w-14 h-14 rounded-full bg-slate-800/90 border border-slate-700/80 text-slate-400 hover:text-rose-400 text-xl flex items-center justify-center transition shadow-xl hover:border-rose-500/50 active:scale-95">
+                    <button onclick="accionRechazar()" class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-rose-500 hover:border-rose-500/50 text-2xl flex items-center justify-center transition shadow-xl active:scale-90">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    
+
                     <!-- Super Like -->
-                    <button onclick="darSuperLike()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950 text-lg flex items-center justify-center transition shadow-lg shadow-amber-500/20 hover:scale-110 active:scale-95">
+                    <button onclick="accionSuperLike()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950 text-lg flex items-center justify-center transition shadow-lg shadow-amber-500/20 hover:scale-110 active:scale-90">
                         <i class="fa-solid fa-bolt"></i>
                     </button>
 
                     <!-- Me Gusta (Corazón con Flecha) -->
-                    <button onclick="darLike()" class="w-16 h-16 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white text-2xl flex items-center justify-center transition shadow-xl shadow-rose-500/30 hover:scale-105 active:scale-95">
+                    <button onclick="accionLike()" class="w-16 h-16 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white text-2xl flex items-center justify-center transition shadow-xl shadow-rose-500/40 hover:scale-105 active:scale-90 glow-heart">
                         <i class="fa-solid fa-heart-circle-arrow-up"></i>
                     </button>
                 </div>
@@ -106,85 +128,107 @@
         </div>
     </main>
 
-    <!-- VISTA 2: Lista de Matches y Chats -->
+    <!-- VISTA 2: LISTA DE MATCHES Y CHATS -->
     <main id="vista-matches" class="w-full max-w-md mx-auto p-4 flex-1 hidden flex-col">
-        <h2 class="text-xl font-extrabold text-white mb-4 flex items-center">
-            <i class="fa-solid fa-comments text-rose-500 mr-2"></i> Tus Matches Tucumanos
+        <h2 class="text-xl font-black text-white mb-4 flex items-center">
+            <i class="fa-solid fa-comments text-rose-500 mr-2"></i> Mis Matches Tucumanos
         </h2>
         <div id="lista-matches" class="space-y-3"></div>
     </main>
 
-    <!-- VISTA 3: Chat Individual -->
-    <main id="vista-chat" class="w-full max-w-md mx-auto flex-1 hidden flex-col bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden h-[78vh] my-auto shadow-2xl">
-        <div class="p-3.5 bg-slate-800/90 border-b border-slate-700/80 flex items-center justify-between">
+    <!-- VISTA 3: CHAT INDIVIDUAL -->
+    <main id="vista-chat" class="w-full max-w-md mx-auto flex-1 hidden flex-col glass rounded-[32px] overflow-hidden h-[80vh] my-auto shadow-2xl">
+        <!-- Header Chat -->
+        <div class="p-3.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <button onclick="volverAMatches()" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                <button onclick="volverAMatches()" class="w-8 h-8 rounded-full glass-btn text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
                 </button>
                 <img id="chat-user-img" src="" class="w-10 h-10 rounded-full object-cover border-2 border-rose-500">
                 <div>
                     <h3 id="chat-user-name" class="font-bold text-sm text-white"></h3>
-                    <p class="text-[11px] text-emerald-400 font-medium">En línea</p>
+                    <p class="text-[10px] text-emerald-400 font-bold flex items-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span> En línea
+                    </p>
                 </div>
             </div>
-            <button onclick="sugerirCita()" class="px-3 py-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full text-xs font-bold hover:bg-amber-500/30 transition flex items-center">
+            <button onclick="sugerirCitaTucumana()" class="px-3 py-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full text-xs font-bold hover:bg-amber-500/30 transition flex items-center">
                 <i class="fa-solid fa-location-dot mr-1"></i> Proponer Cita
             </button>
         </div>
 
-        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm bg-slate-950/50"></div>
+        <!-- Mensajes -->
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs bg-slate-950/60"></div>
 
-        <form onsubmit="enviarMensaje(event)" class="p-3 bg-slate-800 border-t border-slate-700/80 flex items-center space-x-2">
-            <input type="text" id="chat-input" placeholder="Escribí un mensaje..." required class="flex-1 bg-slate-900 border border-slate-700/80 rounded-full px-4 py-2.5 text-sm text-white focus:outline-none focus:border-rose-500">
-            <button type="submit" class="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition shadow-lg">
+        <!-- Formulario Envío -->
+        <form onsubmit="enviarMensajeChat(event)" class="p-3 bg-slate-900 border-t border-slate-800 flex items-center space-x-2">
+            <input type="text" id="chat-input" placeholder="Escribí un mensaje..." required class="flex-1 bg-slate-950 border border-slate-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none focus:border-rose-500">
+            <button type="submit" class="w-10 h-10 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 text-white flex items-center justify-center shadow-lg active:scale-95">
                 <i class="fa-solid fa-paper-plane text-xs"></i>
             </button>
         </form>
     </main>
 
-    <!-- Pop-Up de Match -->
-    <div id="modal-match-popup" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center p-6 text-center">
-        <div class="w-20 h-20 rounded-full bg-rose-600/20 border-2 border-rose-500 flex items-center justify-center mb-4 animate-bounce">
-            <i class="fa-solid fa-heart-circle-bolt text-rose-500 text-4xl"></i>
-        </div>
-        <h2 class="text-3xl font-black text-white mb-2 tracking-tight">¡ES UN MATCH TUCUMANO! 🎉</h2>
-        <p id="popup-match-text" class="text-slate-300 text-sm mb-6 max-w-xs"></p>
-        <button onclick="irAChatDesdePopup()" class="w-full max-w-xs bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold py-3.5 rounded-2xl shadow-xl shadow-rose-600/40 mb-3 active:scale-95 transition">Enviar Mensaje</button>
-        <button onclick="cerrarPopupMatch()" class="text-slate-400 text-xs font-semibold hover:text-white">Seguir viendo perfiles</button>
-    </div>
-
-    <!-- Modal Verificación Selfie -->
-    <div id="modal-verificacion" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 text-center relative shadow-2xl">
-            <button onclick="cerrarVerificacion()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-id-card text-2xl"></i>
+    <!-- VISTA 4: MI PERFIL -->
+    <main id="vista-perfil" class="w-full max-w-md mx-auto p-4 flex-1 hidden flex-col">
+        <div class="glass p-6 rounded-[32px] text-center mb-4">
+            <div class="relative w-24 h-24 mx-auto mb-3">
+                <img id="my-profile-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500" class="w-full h-full rounded-full object-cover border-4 border-rose-500 shadow-xl">
+                <button onclick="abrirModalCrearPerfil()" class="absolute bottom-0 right-0 bg-rose-600 text-white w-8 h-8 rounded-full border-2 border-slate-900 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
             </div>
-            <h3 class="text-lg font-extrabold text-white mb-2">Verificación de Perfil</h3>
-            <p class="text-xs text-slate-400 mb-5">Tomate una selfie para verificar tu perfil y obtener la tilde verde de TucuMatch.</p>
-            <input type="file" accept="image/*" capture="user" id="selfie-file" class="hidden" onchange="procesarVerificacion()">
-            <button onclick="document.getElementById('selfie-file').click()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition">Tomar Selfie / Subir Foto</button>
+            <h3 id="my-profile-name" class="text-xl font-black text-white">Mi Perfil</h3>
+            <p id="my-profile-location" class="text-xs text-slate-400">San Miguel de Tucumán</p>
+
+            <div class="grid grid-cols-2 gap-3 mt-6">
+                <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+                    <p class="text-2xl font-black text-rose-500" id="stat-likes">24</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Likes Recibidos</p>
+                </div>
+                <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+                    <p class="text-2xl font-black text-amber-400" id="stat-views">182</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Visitas</p>
+                </div>
+            </div>
         </div>
+
+        <button onclick="abrirModalCrearPerfil()" class="w-full bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold py-3.5 rounded-2xl shadow-xl">
+            <i class="fa-solid fa-user-pen mr-2"></i> Editar Perfil / Cambiar Fotos
+        </button>
+    </main>
+
+    <!-- POPUP MATCH ANIMADO -->
+    <div id="modal-match-popup" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 hidden flex flex-col items-center justify-center p-6 text-center">
+        <div class="w-24 h-24 rounded-full bg-rose-600/20 border-2 border-rose-500 flex items-center justify-center mb-4 animate-bounce">
+            <i class="fa-solid fa-heart-circle-bolt text-rose-500 text-5xl"></i>
+        </div>
+        <h2 class="text-3xl font-black text-white mb-2 tracking-tight">¡MATCH TUCUMANO! 🎉</h2>
+        <p id="popup-match-text" class="text-slate-300 text-xs mb-6 max-w-xs"></p>
+        <button onclick="irAChatDesdePopup()" class="w-full max-w-xs bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold py-3.5 rounded-2xl shadow-xl mb-3 active:scale-95 transition">
+            Enviar Mensaje
+        </button>
+        <button onclick="cerrarPopupMatch()" class="text-slate-400 text-xs font-semibold hover:text-white">Seguir deslizando</button>
     </div>
 
-    <!-- Modal Crear Perfil -->
-    <div id="modal-crear" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto shadow-2xl">
+    <!-- MODAL CREAR / EDITAR PERFIL -->
+    <div id="modal-crear" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-[32px] p-6 relative max-h-[90vh] overflow-y-auto shadow-2xl">
             <button onclick="cerrarModalCrearPerfil()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-lg font-extrabold text-white mb-4">Crear Mi Perfil</h3>
+            <h3 class="text-lg font-black text-white mb-4">Editar Mi Perfil</h3>
             
             <form onsubmit="guardarNuevoPerfil(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre</label>
-                    <input type="text" id="nuevo-nombre" required class="w-full bg-slate-800 border border-slate-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-rose-500">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Nombre</label>
+                    <input type="text" id="nuevo-nombre" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-rose-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Edad</label>
-                    <input type="number" id="nueva-edad" min="18" max="99" required class="w-full bg-slate-800 border border-slate-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-rose-500">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Edad</label>
+                    <input type="number" id="nueva-edad" min="18" max="99" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-rose-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Localidad de Tucumán</label>
-                    <select id="nuevo-barrio" required class="w-full bg-slate-800 border border-slate-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-rose-500">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Localidad de Tucumán</label>
+                    <select id="nuevo-barrio" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-rose-500">
                         <option value="San Miguel de Tucumán - Centro">San Miguel de Tucumán (Centro)</option>
                         <option value="San Miguel de Tucumán - Barrio Norte">San Miguel de Tucumán (Barrio Norte)</option>
                         <option value="San Miguel de Tucumán - Barrio Sur">San Miguel de Tucumán (Barrio Sur)</option>
@@ -195,49 +239,52 @@
                         <option value="Tafí del Valle">Tafí del Valle</option>
                         <option value="Monteros">Monteros</option>
                         <option value="Famaillá">Famaillá</option>
-                        <option value="Lules">Lules</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Pregunta Tucumana</label>
-                    <select id="nueva-pregunta" class="w-full bg-slate-800 border border-slate-700/80 rounded-xl p-3 text-sm text-white mb-2">
-                        <option value="¿Sanguche de milanesa en primera cita?">¿Sanguche de milanesa en primera cita?</option>
-                        <option value="¿Empanada tucumana con limón?">¿Empanada tucumana con limón?</option>
-                        <option value="¿Mejor lugar para merendar?">¿Mejor lugar para merendar?</option>
-                    </select>
-                    <input type="text" id="nueva-respuesta" placeholder="Tu respuesta..." required class="w-full bg-slate-800 border border-slate-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-rose-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Fotos (Subir desde Galería)</label>
-                    <input type="file" id="nuevas-fotos" accept="image/*" multiple required onchange="previsualizarImagenes(event)" class="w-full bg-slate-800 border border-slate-700/80 rounded-xl p-2 text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-rose-600 file:text-white cursor-pointer">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Fotos (Subir desde Galería)</label>
+                    <input type="file" id="nuevas-fotos" accept="image/*" multiple required onchange="previsualizarImagenes(event)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-rose-600 file:text-white cursor-pointer">
                     <div id="preview-grid" class="mt-3 grid grid-cols-3 gap-2 hidden"></div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Bio / Presentación</label>
-                    <textarea id="nueva-bio" rows="2" placeholder="Contá sobre vos..." class="w-full bg-slate-800 border border-slate-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-rose-500"></textarea>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Bio / Presentación</label>
+                    <textarea id="nueva-bio" rows="2" placeholder="Contá sobre vos..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-rose-500"></textarea>
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-extrabold py-3.5 rounded-2xl shadow-xl shadow-rose-600/30 transition">Guardar Perfil</button>
+                <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-pink-600 text-white font-extrabold py-3.5 rounded-2xl shadow-xl">Guardar Cambios</button>
             </form>
         </div>
     </div>
 
-    <!-- Navegación Inferior Estilo App -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/80 py-2.5 z-40 max-w-md mx-auto flex justify-around items-center">
-        <button id="btn-tab-descubrir" onclick="cambiarPestaña('descubrir')" class="flex flex-col items-center text-rose-500 font-bold text-[11px]">
+    <!-- MODAL VERIFICACIÓN -->
+    <div id="modal-verificacion" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-[32px] p-6 text-center relative shadow-2xl">
+            <button onclick="cerrarVerificacion()" class="absolute top-4 right-4 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <i class="fa-solid fa-id-card text-emerald-400 text-4xl mb-3"></i>
+            <h3 class="text-lg font-black text-white mb-2">Verificación de Perfil</h3>
+            <p class="text-xs text-slate-400 mb-5">Subí una selfie para verificar tu cuenta y obtener la tilde verde oficial.</p>
+            <input type="file" accept="image/*" capture="user" id="selfie-file" class="hidden" onchange="procesarVerificacion()">
+            <button onclick="document.getElementById('selfie-file').click()" class="w-full bg-emerald-500 text-slate-950 font-bold py-3.5 rounded-2xl">Tomar Selfie / Subir Foto</button>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN INFERIOR NATIVA -->
+    <nav class="w-full max-w-md mx-auto glass sticky bottom-0 z-40 py-2.5 px-6 flex justify-around items-center shadow-2xl">
+        <button id="nav-descubrir" onclick="cambiarPestaña('descubrir')" class="flex flex-col items-center text-rose-500 font-bold text-[11px]">
             <i class="fa-solid fa-heart-circle-arrow-up text-xl mb-0.5"></i>
             <span>Descubrir</span>
         </button>
-        <button id="btn-tab-matches" onclick="cambiarPestaña('matches')" class="flex flex-col items-center text-slate-400 hover:text-white text-[11px] relative">
+        <button id="nav-matches" onclick="cambiarPestaña('matches')" class="flex flex-col items-center text-slate-400 hover:text-white text-[11px] relative">
             <i class="fa-solid fa-comments text-xl mb-0.5"></i>
             <span>Matches</span>
             <span id="badge-matches-count" class="absolute -top-1 right-2 bg-rose-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden font-bold">0</span>
         </button>
-        <button onclick="abrirModalCrearPerfil()" class="flex flex-col items-center text-slate-400 hover:text-white text-[11px]">
+        <button id="nav-perfil" onclick="cambiarPestaña('perfil')" class="flex flex-col items-center text-slate-400 hover:text-white text-[11px]">
             <i class="fa-solid fa-user text-xl mb-0.5"></i>
             <span>Mi Perfil</span>
         </button>
     </nav>
 
+    <!-- SCRIPT DE LÓGICA INTERACTIVA -->
     <script>
         let perfiles = [];
         let matches = [];
@@ -300,19 +347,30 @@
             if (fotoIndex > 0) { fotoIndex--; actualizarFotoYDots(); }
         }
 
-        function siguientePerfil() {
-            indexPerfil = (indexPerfil + 1) % perfiles.length;
-            mostrarPerfil(indexPerfil);
+        function animarTarjetaYContinuar(direccion) {
+            const card = document.getElementById('card-main');
+            const offset = direccion === 'derecha' ? 500 : -500;
+            card.style.transform = `translateX(${offset}px) rotate(${direccion === 'derecha' ? 20 : -20}deg)`;
+            card.style.opacity = '0';
+
+            setTimeout(() => {
+                indexPerfil = (indexPerfil + 1) % perfiles.length;
+                mostrarPerfil(indexPerfil);
+                card.style.transform = 'none';
+                card.style.opacity = '1';
+            }, 300);
         }
 
-        function darLike() {
+        function accionRechazar() { animarTarjetaYContinuar('izquierda'); }
+
+        function accionLike() {
             const p = perfiles[indexPerfil];
             const nuevoMatch = {
                 id: p.id,
                 nombre: p.nombre,
                 barrio: p.barrio,
                 foto: p.fotos[0],
-                mensajes: [{ emisor: "otro", texto: `¡Hola! ¡Hicimos Match! 🎉 ¿Qué tal unas empanadas o un sanguchazo en ${p.barrio}?` }]
+                mensajes: [{ emisor: "otro", texto: `¡Hola! ¡Hicimos Match! 🎉 ¿Sale un sanguche de milanesa en ${p.barrio}?` }]
             };
 
             if (!matches.some(m => m.id === nuevoMatch.id)) { matches.unshift(nuevoMatch); }
@@ -321,12 +379,13 @@
             matchActivo = nuevoMatch;
             document.getElementById('popup-match-text').innerText = `A ${p.nombre} también le gustaste.`;
             document.getElementById('modal-match-popup').classList.remove('hidden');
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         }
 
-        function darSuperLike() {
+        function accionSuperLike() {
             const p = perfiles[indexPerfil];
-            alert(`⚡ ¡Super-Like enviado a ${p.nombre}! Le aparecerás primero en su lista.`);
-            darLike();
+            alert(`⚡ ¡Super-Like enviado a ${p.nombre}!`);
+            accionLike();
         }
 
         function irAChatDesdePopup() {
@@ -337,24 +396,29 @@
 
         function cerrarPopupMatch() {
             document.getElementById('modal-match-popup').classList.add('hidden');
-            siguientePerfil();
+            animarTarjetaYContinuar('derecha');
         }
 
         function cambiarPestaña(tab) {
             document.getElementById('vista-descubrir').classList.add('hidden');
             document.getElementById('vista-matches').classList.add('hidden');
             document.getElementById('vista-chat').classList.add('hidden');
+            document.getElementById('vista-perfil').classList.add('hidden');
 
-            document.getElementById('btn-tab-descubrir').className = "flex flex-col items-center text-slate-400 hover:text-white text-[11px]";
-            document.getElementById('btn-tab-matches').className = "flex flex-col items-center text-slate-400 hover:text-white text-[11px] relative";
+            document.getElementById('nav-descubrir').className = "flex flex-col items-center text-slate-400 hover:text-white text-[11px]";
+            document.getElementById('nav-matches').className = "flex flex-col items-center text-slate-400 hover:text-white text-[11px] relative";
+            document.getElementById('nav-perfil').className = "flex flex-col items-center text-slate-400 hover:text-white text-[11px]";
 
             if (tab === 'descubrir') {
                 document.getElementById('vista-descubrir').classList.remove('hidden');
-                document.getElementById('btn-tab-descubrir').className = "flex flex-col items-center text-rose-500 font-bold text-[11px]";
+                document.getElementById('nav-descubrir').className = "flex flex-col items-center text-rose-500 font-bold text-[11px]";
             } else if (tab === 'matches') {
                 document.getElementById('vista-matches').classList.remove('hidden');
-                document.getElementById('btn-tab-matches').className = "flex flex-col items-center text-rose-500 font-bold text-[11px] relative";
+                document.getElementById('nav-matches').className = "flex flex-col items-center text-rose-500 font-bold text-[11px] relative";
                 renderizarListaMatches();
+            } else if (tab === 'perfil') {
+                document.getElementById('vista-perfil').classList.remove('hidden');
+                document.getElementById('nav-perfil').className = "flex flex-col items-center text-rose-500 font-bold text-[11px]";
             }
         }
 
@@ -362,12 +426,12 @@
             const cont = document.getElementById('lista-matches');
             cont.innerHTML = '';
             if (matches.length === 0) {
-                cont.innerHTML = `<div class="text-center py-12"><i class="fa-solid fa-heart-crack text-4xl text-slate-700 mb-3 block"></i><p class="text-slate-400 text-sm">No tenés matches todavía.<br>¡Dale Me Gusta a perfiles en Descubrir!</p></div>`;
+                cont.innerHTML = `<div class="text-center py-12"><i class="fa-solid fa-heart-crack text-4xl text-slate-700 mb-3 block"></i><p class="text-slate-400 text-xs">No tenés matches todavía.<br>¡Dale Me Gusta a perfiles en Descubrir!</p></div>`;
                 return;
             }
             matches.forEach(m => {
                 const div = document.createElement('div');
-                div.className = 'bg-slate-900 border border-slate-800/80 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer hover:border-rose-500/50 transition shadow-lg';
+                div.className = 'glass p-3.5 rounded-2xl flex items-center justify-between cursor-pointer hover:border-rose-500/50 transition shadow-lg';
                 div.onclick = () => abrirChat(m);
                 div.innerHTML = `
                     <div class="flex items-center space-x-3.5">
@@ -405,7 +469,7 @@
                 const div = document.createElement('div');
                 div.className = `flex ${esYo ? 'justify-end' : 'justify-start'}`;
                 div.innerHTML = `
-                    <div class="max-w-[78%] px-4 py-2.5 rounded-2xl text-xs ${esYo ? 'bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-br-none shadow-md' : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700/70'}">
+                    <div class="max-w-[78%] px-4 py-2.5 rounded-2xl text-xs ${esYo ? 'bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-br-none shadow-md' : 'bg-slate-900 text-slate-200 rounded-bl-none border border-slate-800'}">
                         ${msg.texto}
                     </div>
                 `;
@@ -414,7 +478,7 @@
             cont.scrollTop = cont.scrollHeight;
         }
 
-        function enviarMensaje(e) {
+        function enviarMensajeChat(e) {
             e.preventDefault();
             const input = document.getElementById('chat-input');
             const texto = input.value.trim();
@@ -428,14 +492,14 @@
                 const respuestas = [
                     "¡De una! ¿Nos encontramos en la Av. Aconquija?",
                     "¡Totalmente! Sanguche de milanesa con todo siempre 🥪",
-                    "¡Avísame cuando estés libre y coordinamos un café!"
+                    "¡Avísame cuando estés libre y coordinamos!"
                 ];
                 matchActivo.mensajes.push({ emisor: 'otro', texto: respuestas[Math.floor(Math.random() * respuestas.length)] });
                 renderizarMensajes();
             }, 1000);
         }
 
-        function sugerirCita() {
+        function sugerirCitaTucumana() {
             const lugares = [
                 "📍 Cita sugerida: Plaza Independencia / Bar histórico",
                 "📍 Cita sugerida: Merendero en Av. Aconquija (Yerba Buena)",
@@ -480,3 +544,34 @@
                     }
                     reader.readAsDataURL(file);
                 });
+            }
+        }
+
+        function abrirModalCrearPerfil() { document.getElementById('modal-crear').classList.remove('hidden'); }
+        function cerrarModalCrearPerfil() { document.getElementById('modal-crear').classList.add('hidden'); }
+
+        async function guardarNuevoPerfil(e) {
+            e.preventDefault();
+            const nuevo = {
+                nombre: document.getElementById('nuevo-nombre').value,
+                edad: parseInt(document.getElementById('nueva-edad').value),
+                barrio: document.getElementById('nuevo-barrio').value,
+                bio: document.getElementById('nueva-bio').value,
+                fotos: fotosCargadasBase64.length > 0 ? fotosCargadasBase64 : ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600"]
+            };
+
+            document.getElementById('my-profile-name').innerText = nuevo.nombre + ", " + nuevo.edad;
+            document.getElementById('my-profile-location').innerText = nuevo.barrio;
+            document.getElementById('my-profile-img').src = nuevo.fotos[0];
+
+            perfiles.unshift(nuevo);
+            indexPerfil = 0;
+            mostrarPerfil(0);
+            cerrarModalCrearPerfil();
+            alert("¡Perfil guardado con éxito!");
+        }
+
+        window.onload = cargarPerfiles;
+    </script>
+</body>
+</html>
