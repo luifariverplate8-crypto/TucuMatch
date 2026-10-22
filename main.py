@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -21,8 +21,8 @@ class ProfileCreate(BaseModel):
     edad: int
     barrio: str
     bio: str
-    pregunta: Optional[str] = "Sanguche de milanesa en primera cita:"
-    respuesta: Optional[str] = "¡Buen plan!"
+    pregunta: Optional[str] = "¿Sanguche de milanesa en primera cita?"
+    respuesta: Optional[str] = "¡Buen plan de una!"
     fotos: List[str]
 
 def init_db():
@@ -61,29 +61,51 @@ def get_profiles():
     conn.close()
 
     if not rows:
-        # Perfiles iniciales si la BD está vacía
+        # Perfiles oficiales de lanzamiento para Tucumán
         return [
             {
                 "id": 1,
                 "nombre": "Lucía",
                 "edad": 24,
                 "barrio": "Yerba Buena",
-                "bio": "Amante del cerro San Javier y el sanguchazo de milanesa con todo 🥪",
+                "bio": "Fan del cerro San Javier, mates en el parque y el sanguchazo con todo 🥪",
                 "pregunta": "¿Sanguche de milanesa en primera cita?",
-                "respuesta": "¡Buen plan de una!",
+                "respuesta": "¡Totalmente, re buen plan!",
                 "verificado": True,
-                "fotos": ["https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500"]
+                "fotos": ["https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500"]
             },
             {
                 "id": 2,
                 "nombre": "Gonzalo",
                 "edad": 27,
-                "barrio": "Barrio Norte",
-                "bio": "Café en la plaza San Martín los domingos y mates en el parque 🌿",
+                "barrio": "San Miguel de Tucumán - Barrio Norte",
+                "bio": "Café en Barrio Norte los domingos y salidas a la Aconquija ☕",
                 "pregunta": "¿Empanada tucumana con limón?",
-                "respuesta": "Sí, obligatorio 🍋",
+                "respuesta": "Sí o sí, sin discusión 🍋",
                 "verificado": True,
                 "fotos": ["https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500"]
+            },
+            {
+                "id": 3,
+                "nombre": "Valentina",
+                "edad": 22,
+                "barrio": "Tafí del Valle",
+                "bio": "Amante de los valles, las caminatas y el queso tafisto 🌄",
+                "pregunta": "¿Mejor lugar para merendar?",
+                "respuesta": "Mirador de Tafí del Valle",
+                "verificado": True,
+                "fotos": ["https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500"]
+            },
+            {
+                "id": 4,
+                "nombre": "Mateo",
+                "edad": 25,
+                "barrio": "Concepción",
+                "bio": "Estudiante de agronomía, apasionado de las motos y el fútbol ⚽",
+                "pregunta": "¿Sanguche de milanesa en primera cita?",
+                "respuesta": "Obvio, en la sanguchería del barrio",
+                "verificado": True,
+                "fotos": ["https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=500"]
             }
         ]
 
