@@ -61,8 +61,15 @@
                     <div class="flex items-baseline justify-between mb-2">
                         <h2 class="text-2xl font-bold text-white"><span id="profile-nombre">Lucía</span>, <span id="profile-edad" class="text-slate-400 font-normal">24</span></h2>
                     </div>
-                    <p id="profile-bio" class="text-slate-300 text-sm leading-relaxed mb-4"></p>
+                    <p id="profile-bio" class="text-slate-300 text-sm leading-relaxed mb-3"></p>
                     
+                    <!-- Etiquetas de Gustos / Intereses -->
+                    <div id="profile-tags" class="flex flex-wrap gap-1.5 mb-3">
+                        <span class="px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-full text-[11px] text-slate-300">🥪 Sanguche de milanesa</span>
+                        <span class="px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-full text-[11px] text-slate-300">🌿 Cerro San Javier</span>
+                        <span class="px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-full text-[11px] text-slate-300">☕ Mates en la plaza</span>
+                    </div>
+
                     <!-- Trivia / Rompehielos -->
                     <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50 mb-2">
                         <p id="profile-pregunta" class="text-xs text-rose-400 font-bold uppercase tracking-wider mb-1"></p>
@@ -71,10 +78,15 @@
                 </div>
 
                 <!-- Botones de Acción -->
-                <div class="flex items-center justify-evenly pt-4">
-                    <button onclick="siguientePerfil()" class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-rose-400 text-2xl flex items-center justify-center transition shadow-lg active:scale-95">
+                <div class="flex items-center justify-evenly pt-3">
+                    <button onclick="siguientePerfil()" class="w-13 h-13 p-3.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-rose-400 text-xl flex items-center justify-center transition shadow-lg active:scale-95">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
+                    <!-- Super Like -->
+                    <button onclick="darSuperLike()" class="w-13 h-13 p-3.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-xl flex items-center justify-center transition shadow-xl shadow-amber-500/20 active:scale-95 hover:scale-105">
+                        <i class="fa-solid fa-bolt text-lg"></i>
+                    </button>
+                    <!-- Like Normal -->
                     <button onclick="darLike()" class="w-16 h-16 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white text-2xl flex items-center justify-center transition shadow-xl active:scale-95 hover:scale-105">
                         <i class="fa-solid fa-heart-circle-arrow-up text-2xl"></i>
                     </button>
@@ -103,13 +115,16 @@
                 </div>
             </div>
             <button onclick="sugerirCita()" class="px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-xs font-semibold hover:bg-amber-500/30">
-                <i class="fa-solid fa-location-dot mr-1"></i> Cita Tucumana
+                <i class="fa-solid fa-location-dot mr-1"></i> Proponer Cita
             </button>
         </div>
 
         <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm"></div>
 
         <form onsubmit="enviarMensaje(event)" class="p-3 bg-slate-800 border-t border-slate-700 flex items-center space-x-2">
+            <button type="button" onclick="enviarAudioSimulado()" class="w-10 h-10 rounded-full bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-microphone text-xs"></i>
+            </button>
             <input type="text" id="chat-input" placeholder="Escribí un mensaje..." required class="flex-1 bg-slate-900 border border-slate-700 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-rose-500">
             <button type="submit" class="w-10 h-10 rounded-full bg-rose-600 text-white flex items-center justify-center">
                 <i class="fa-solid fa-paper-plane text-xs"></i>
@@ -285,10 +300,15 @@
 
             actualizarBadgeMatches();
             
-            // Pop-Up Match
             matchActivo = nuevoMatch;
             document.getElementById('popup-match-text').innerText = `A ${p.nombre} también le gustaste.`;
             document.getElementById('modal-match-popup').classList.remove('hidden');
+        }
+
+        function darSuperLike() {
+            const p = perfiles[indexPerfil];
+            alert(`⚡ ¡Super-Like enviado a ${p.nombre}! Le aparecerás primero en su lista.`);
+            darLike();
         }
 
         function irAChatDesdePopup() {
@@ -390,6 +410,17 @@
             }, 1000);
         }
 
+        function enviarAudioSimulado() {
+            if (!matchActivo) return;
+            matchActivo.mensajes.push({ emisor: 'yo', texto: "🎙️ <i>Nota de voz (0:08)</i>" });
+            renderizarMensajes();
+            
+            setTimeout(() => {
+                matchActivo.mensajes.push({ emisor: 'otro', texto: "🎙️ <i>¡Escuchado! De una che</i>" });
+                renderizarMensajes();
+            }, 1200);
+        }
+
         function sugerirCita() {
             const lugares = [
                 "📍 Cita sugerida: Plaza Independencia / Bar histórico",
@@ -410,7 +441,7 @@
             }
         }
 
-        function abrirVerificacion() { document.getElementById('modal-verificacio').classList.remove('hidden'); }
+        function abrirVerificacion() { document.getElementById('modal-verificacion').classList.remove('hidden'); }
         function cerrarVerificacion() { document.getElementById('modal-verificacion').classList.add('hidden'); }
         
         function procesarVerificacion() {
